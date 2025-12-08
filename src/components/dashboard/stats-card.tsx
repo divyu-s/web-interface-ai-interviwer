@@ -21,7 +21,7 @@ export function StatsCard({
   return (
     <div
       className={cn(
-        "bg-white border border-[rgba(0,0,0,0.1)] rounded p-4",
+        "bg-white border border-[rgba(0,0,0,0.1)] rounded px-6 py-4",
         className
       )}
     >
@@ -44,4 +44,3 @@ export function StatsCard({
     </div>
   );
 }
-

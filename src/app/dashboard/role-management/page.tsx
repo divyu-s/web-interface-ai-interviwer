@@ -1,13 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  Users,
-  UserCheck,
-  UserX,
-  Clock,
-  Eye,
-} from "lucide-react";
+import { Activity, CircleCheck, UserPlus, Target, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatsCard } from "@/components/dashboard/stats-card";
 import { StatusTag } from "@/components/ui/status-tag";
@@ -76,37 +70,35 @@ export default function RoleManagementPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-black">Role Management</h2>
-        <Button onClick={() => setIsModalOpen(true)}>
-          Invite team member
-        </Button>
+        <h2 className="text-xl font-bold text-black">User Management</h2>
+        <Button onClick={() => setIsModalOpen(true)}>Invite team member</Button>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-4 gap-4">
         <StatsCard
-          icon={Users}
+          icon={Activity}
           value={25}
           label="Total users"
           iconBgColor="bg-[rgba(2,86,61,0.1)]"
           iconColor="text-[#02563d]"
         />
         <StatsCard
-          icon={UserCheck}
+          icon={CircleCheck}
           value={16}
           label="Active users"
           iconBgColor="bg-green-50"
           iconColor="text-green-600"
         />
         <StatsCard
-          icon={UserX}
+          icon={UserPlus}
           value={7}
           label="Inactive users"
           iconBgColor="bg-purple-50"
           iconColor="text-purple-600"
         />
         <StatsCard
-          icon={Clock}
+          icon={Target}
           value={4}
           label="Pending invite"
           iconBgColor="bg-yellow-50"
@@ -136,9 +128,7 @@ export default function RoleManagementPage() {
                   key={user.id}
                   className="border-b border-[#e5e5e5] last:border-b-0 h-[77px]"
                 >
-                  <td className="px-4 text-sm text-[#0a0a0a]">
-                    {user.name}
-                  </td>
+                  <td className="px-4 text-sm text-[#0a0a0a]">{user.name}</td>
                   <td className="px-4 text-sm text-[#0a0a0a] text-center">
                     {user.email}
                   </td>
@@ -177,4 +167,3 @@ export default function RoleManagementPage() {
     </div>
   );
 }
-

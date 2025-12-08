@@ -4,7 +4,13 @@ import * as React from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 
 interface InviteModalProps {
@@ -120,10 +126,7 @@ export function InviteTeamMemberModal({
   return (
     <>
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/30 z-40"
-        onClick={handleClose}
-      />
+      <div className="fixed inset-0 bg-black/30 z-40" onClick={handleClose} />
 
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -156,22 +159,22 @@ export function InviteTeamMemberModal({
               </p>
 
               <Input
-                label="Email"
+                // label="Email"
                 type="email"
                 placeholder="rohan@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
 
-              <Select
-                label="Role"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                options={[
-                  { value: "admin", label: "Admin" },
-                  { value: "member", label: "Member" },
-                ]}
-              />
+              <Select value={role} onValueChange={setRole}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="member">Member</SelectItem>
+                </SelectContent>
+              </Select>
 
               {/* Footer */}
               <div className="flex justify-end pt-4">
@@ -358,7 +361,9 @@ export function InviteTeamMemberModal({
                       />
                       <Switch
                         label="Review interview feedbacks"
-                        checked={permissions.interviewScheduling.reviewFeedbacks}
+                        checked={
+                          permissions.interviewScheduling.reviewFeedbacks
+                        }
                         onCheckedChange={(v) =>
                           updatePermission(
                             "interviewScheduling",
@@ -394,4 +399,3 @@ export function InviteTeamMemberModal({
     </>
   );
 }
-
