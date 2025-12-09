@@ -26,6 +26,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -95,9 +96,9 @@ const sampleJobs: Job[] = [
 ];
 
 const statusStyles = {
-  active: "bg-[#d1fae5] text-[#059669] border-[#059669]",
-  draft: "bg-[#f5f5f5] text-[#737373] border-[#737373]",
-  closed: "bg-transparent text-[#dc2626] border-transparent",
+  active: "bg-[#def2eb] text-[#0e4230] border-transparent",
+  draft: "bg-[#e5e5e5] text-[#000000] border-transparent",
+  closed: "bg-[#fcefec] text-[#d92d20] border-transparent",
 };
 
 export default function JobsPage() {
@@ -169,61 +170,69 @@ export default function JobsPage() {
       <JobStatsGrid stats={stats} />
 
       {/* Jobs Table */}
-      <div className="bg-white border border-[#e5e5e5] rounded-lg overflow-hidden">
+      <div className="bg-white border border-[#e5e5e5] rounded-lg overflow-hidden px-4">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-[#e5e5e5]">
-              <th className="text-left py-3 px-4 text-sm font-medium text-[#737373]">
+            <tr className="border-b border-[#e5e5e5] h-10">
+              <th className="text-left px-2 text-sm font-medium text-[#737373]">
                 Position
               </th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-[#737373]">
+              <th className="text-center px-2 text-sm font-medium text-[#737373] w-[125px]">
                 Status
               </th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-[#737373]">
+              <th className="text-center px-2 text-sm font-medium text-[#737373]">
                 No. of opening
               </th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-[#737373]">
+              <th className="text-center px-2 text-sm font-medium text-[#737373]">
                 Applicants
               </th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-[#737373]">
+              <th className="text-center px-2 text-sm font-medium text-[#737373]">
                 Interviews
               </th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-[#737373]">
+              <th className="text-center px-2 text-sm font-medium text-[#737373]">
                 Created
               </th>
-              <th className="w-10"></th>
+              <th className="w-16"></th>
             </tr>
           </thead>
           <tbody>
             {filteredJobs?.map((job) => (
               <tr
                 key={job.id}
-                className="border-b border-[#e5e5e5] last:border-b-0 hover:bg-[#fafafa]"
+                className="border-b border-[#e5e5e5] last:border-b-0 hover:bg-[#fafafa] h-[66px]"
               >
-                <td className="py-4 px-4 text-sm font-medium text-[#0a0a0a]">
+                <td className="px-2 text-sm font-normal text-[#0a0a0a]">
                   {job.position}
                 </td>
-                <td className="py-4 px-4">
-                  <Badge
-                    variant="outline"
-                    className={`capitalize ${statusStyles[job.status]}`}
-                  >
-                    {job.status}
-                  </Badge>
+                <td className="px-2 text-center">
+                  <div className="flex justify-center">
+                    <Badge
+                      variant="outline"
+                      className={`capitalize font-normal text-xs tracking-[0.3px] rounded-full px-2 py-0 h-6 ${
+                        statusStyles[job.status]
+                      }`}
+                    >
+                      {job.status === "active"
+                        ? "Active"
+                        : job.status === "closed"
+                        ? "Closed"
+                        : "Draft"}
+                    </Badge>
+                  </div>
                 </td>
-                <td className="py-4 px-4 text-sm text-[#0a0a0a]">
+                <td className="px-2 text-sm text-[#0a0a0a] text-center">
                   {job.noOfOpening}
                 </td>
-                <td className="py-4 px-4 text-sm text-[#0a0a0a]">
+                <td className="px-2 text-sm text-[#0a0a0a] text-center">
                   {job.applicants}
                 </td>
-                <td className="py-4 px-4 text-sm text-[#0a0a0a]">
+                <td className="px-2 text-sm text-[#0a0a0a] text-center">
                   {job.interviews}
                 </td>
-                <td className="py-4 px-4 text-sm text-[#737373]">
+                <td className="px-2 text-sm text-[#0a0a0a] text-center">
                   {job.created}
                 </td>
-                <td className="py-4 px-4">
+                <td className="px-2">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
@@ -238,19 +247,20 @@ export default function JobsPage() {
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem asChild>
                         <Link href={`/dashboard/jobs/${job.id}`}>
-                          <Eye className="mr-2 h-4 w-4" />
+                          <Eye className="h-4 text-[#737373]" />
                           View details
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem>
-                        <Pencil className="mr-2 h-4 w-4" />
+                        <Pencil className="h-4 text-[#737373]" />
                         Edit
                       </DropdownMenuItem>
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem
                         variant="destructive"
                         onClick={() => handleDeleteJob(job.id)}
                       >
-                        <Trash2 className="mr-2 h-4 w-4" />
+                        <Trash2 className="h-4" />
                         Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>

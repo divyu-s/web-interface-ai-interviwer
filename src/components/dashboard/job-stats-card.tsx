@@ -43,7 +43,7 @@ export function JobStatsCard({ stat, className }: JobStatsCardProps) {
   return (
     <div
       className={cn(
-        "flex items-center gap-3 bg-white border border-[rgba(0,0,0,0.1)] rounded py-[17px] pl-[25px] pr-px",
+        "flex items-center gap-3 bg-white border border-[rgba(0,0,0,0.1)] rounded h-[90px] pl-[25px] pr-px",
         className
       )}
     >
@@ -55,11 +55,11 @@ export function JobStatsCard({ stat, className }: JobStatsCardProps) {
       >
         <Icon className={cn("w-5 h-5", iconColor)} />
       </div>
-      <div className="flex flex-col">
-        <p className="text-2xl font-normal text-neutral-950 leading-8 tracking-[0.07px]">
+      <div className="flex flex-col h-12">
+        <p className="text-2xl font-normal text-neutral-950 leading-8 tracking-[0.07px] font-['Inter']">
           {stat.value}
         </p>
-        <p className="text-xs font-normal text-[#45556c] leading-4">
+        <p className="text-xs font-normal text-[#45556c] leading-4 font-['Inter']">
           {stat.label}
         </p>
       </div>
@@ -73,7 +73,7 @@ interface JobStatsGridProps {
 
 export function JobStatsGrid({ stats }: JobStatsGridProps) {
   return (
-    <div className="grid grid-cols-4 gap-4">
+    <div className="grid grid-cols-4 gap-4 h-[90px]">
       {stats?.map((stat, index) => (
         <JobStatsCard key={index} stat={stat} />
       ))}
