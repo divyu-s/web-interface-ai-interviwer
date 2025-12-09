@@ -1,0 +1,82 @@
+"use client";
+
+import { Target, UserPlus, CircleCheck, Activity } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+export interface JobStat {
+  label: string;
+  value: string | number;
+  icon: "applicants" | "completed" | "hired" | "score";
+}
+
+const iconMap = {
+  applicants: {
+    Icon: Activity,
+    bgColor: "bg-[rgba(2,86,61,0.1)]",
+    iconColor: "text-[#02563d]",
+  },
+  completed: {
+    Icon: CircleCheck,
+    bgColor: "bg-green-50",
+    iconColor: "text-green-600",
+  },
+  hired: {
+    Icon: UserPlus,
+    bgColor: "bg-purple-50",
+    iconColor: "text-purple-600",
+  },
+  score: {
+    Icon: Target,
+    bgColor: "bg-yellow-50",
+    iconColor: "text-yellow-600",
+  },
+};
+
+interface JobStatsCardProps {
+  stat: JobStat;
+  className?: string;
+}
+
+export function JobStatsCard({ stat, className }: JobStatsCardProps) {
+  const { Icon, bgColor, iconColor } = iconMap[stat.icon];
+
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-3 bg-white border border-[rgba(0,0,0,0.1)] rounded py-[17px] pl-[25px] pr-px",
+        className
+      )}
+    >
+      <div
+        className={cn(
+          "w-10 h-10 rounded-[10px] flex items-center justify-center shrink-0",
+          bgColor
+        )}
+      >
+        <Icon className={cn("w-5 h-5", iconColor)} />
+      </div>
+      <div className="flex flex-col">
+        <p className="text-2xl font-normal text-neutral-950 leading-8 tracking-[0.07px]">
+          {stat.value}
+        </p>
+        <p className="text-xs font-normal text-[#45556c] leading-4">
+          {stat.label}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+interface JobStatsGridProps {
+  stats: JobStat[];
+}
+
+export function JobStatsGrid({ stats }: JobStatsGridProps) {
+  return (
+    <div className="grid grid-cols-4 gap-4">
+      {stats?.map((stat, index) => (
+        <JobStatsCard key={index} stat={stat} />
+      ))}
+    </div>
+  );
+}
