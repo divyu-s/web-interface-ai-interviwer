@@ -66,6 +66,9 @@ interface InterviewFormData {
 
   // Step 6: Instructions & settings
   instructions: string;
+  allowSkip: boolean;
+  sendReminder: boolean;
+  reminderTime: string;
   enableRecording: boolean;
   enableTranscription: boolean;
   enableFeedback: boolean;
@@ -137,6 +140,15 @@ const existingJobs = [
   { id: "3", title: "Backend Engineer", domain: "Engineering" },
 ];
 
+const reminderTimeOptions = [
+  { value: "15", label: "15 minutes before" },
+  { value: "30", label: "30 minutes before" },
+  { value: "60", label: "1 hour before" },
+  { value: "120", label: "2 hours before" },
+  { value: "1440", label: "1 day before" },
+  { value: "2880", label: "2 days" },
+];
+
 export function CreateInterviewDialog({
   open,
   onOpenChange,
@@ -166,6 +178,9 @@ export function CreateInterviewDialog({
     customQuestionsCount: 0,
     customQuestions: [],
     instructions: "",
+    allowSkip: false,
+    sendReminder: false,
+    reminderTime: "15",
     enableRecording: true,
     enableTranscription: true,
     enableFeedback: true,
@@ -243,6 +258,9 @@ export function CreateInterviewDialog({
       customQuestionsCount: 0,
       customQuestions: [],
       instructions: "",
+      allowSkip: false,
+      sendReminder: false,
+      reminderTime: "15",
       enableRecording: true,
       enableTranscription: true,
       enableFeedback: true,
