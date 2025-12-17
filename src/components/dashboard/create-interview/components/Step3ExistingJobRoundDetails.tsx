@@ -1,21 +1,8 @@
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { CheckCircle2, Copy, Users } from "lucide-react";
 import type { InterviewFormData } from "../types";
-import {
-  DURATION_OPTIONS,
-  LANGUAGE_OPTIONS,
-  MOCK_INTERVIEWERS,
-  MOCK_EXISTING_JOBS,
-  MOCK_ROUNDS,
-} from "../constants";
+import { useState } from "react";
+import { ShareInterviewLinkModal } from "./ShareInterviewLinkModal";
 
 interface Step3ExistingJobRoundDetailsProps {
   formData: InterviewFormData;
@@ -29,127 +16,102 @@ export const Step3ExistingJobRoundDetails = ({
   formData,
   onFieldChange,
 }: Step3ExistingJobRoundDetailsProps) => {
-  const selectedJob = MOCK_EXISTING_JOBS.find(
-    (job) => job.id === formData.selectedJobId
-  );
-  const selectedRound = MOCK_ROUNDS.find(
-    (round) => round.value === formData.selectedRoundId
-  );
+  const [copied, setCopied] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  // Get actual data from formData or use defaults
+  const interviewData = {
+    roundType: formData.roundType || "Behavioural",
+    jobTitle: formData.jobTitle || "Senior product manager",
+    duration: formData.duration || "45min.",
+    interviewLink: `https://yourcompany.com/interview/INT-${Date.now()}`,
+  };
+
+  const handleCopyLink = async () => {
+    if (interviewData.interviewLink) {
+      try {
+        await navigator.clipboard.writeText(interviewData.interviewLink);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error("Failed to copy:", err);
+      }
+    }
+  };
 
   return (
-    <div className="flex flex-col gap-4">
-      <p className="text-sm font-bold text-[#0a0a0a] leading-none">
-        Interview configuration
-      </p>
-
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <Label className="text-sm font-medium text-[#0a0a0a] leading-none">
-            Selected job opening
-          </Label>
-          <div className="px-3 py-2 bg-[#f5f5f5] rounded border border-[#e5e5e5] text-sm text-[#0a0a0a]">
-            {selectedJob?.title || "Not selected"}
-          </div>
+    <>
+      <div className="flex flex-col items-center text-center">
+        {/* Success Icon */}
+        <div className="flex items-center justify-center w-[80px] h-[80px] rounded-full bg-[#e0f2f1] shrink-0 mb-6">
+          <CheckCircle2
+            className="w-10 h-10 text-[#267e6b]"
+            strokeWidth={2.5}
+          />
         </div>
 
-        <div className="flex flex-col gap-2">
-          <Label className="text-sm font-medium text-[#0a0a0a] leading-none">
-            Selected interview round
-          </Label>
-          <div className="px-3 py-2 bg-[#f5f5f5] rounded border border-[#e5e5e5] text-sm text-[#0a0a0a]">
-            {selectedRound?.label || "Not selected"}
-          </div>
+        {/* Main Heading */}
+        <div className="mb-4">
+          <h2 className="text-[24px] font-bold text-[#0a0a0a] leading-[1.2]">
+            Success! Your AI interview has been created.
+          </h2>
         </div>
 
-        <div className="flex gap-[10px]">
-          <div className="flex-1 flex flex-col gap-2">
-            <Label className="text-sm font-medium text-[#0a0a0a] leading-none">
-              Duration <span className="text-[#0a0a0a]">*</span>
-            </Label>
-            <Select
-              value={formData.duration}
-              onValueChange={(value) => onFieldChange("duration", value)}
-            >
-              <SelectTrigger className="w-full h-9 shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)] border-[#e5e5e5]">
-                <SelectValue placeholder="Select" />
-              </SelectTrigger>
-              <SelectContent>
-                {DURATION_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex-1 flex flex-col gap-2">
-            <Label className="text-sm font-medium text-[#0a0a0a] leading-none">
-              Language <span className="text-[#0a0a0a]">*</span>
-            </Label>
-            <Select
-              value={formData.language}
-              onValueChange={(value) => onFieldChange("language", value)}
-            >
-              <SelectTrigger className="w-full h-9 shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)] border-[#e5e5e5]">
-                <SelectValue placeholder="Select" />
-              </SelectTrigger>
-              <SelectContent>
-                {LANGUAGE_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        {/* Descriptive Text */}
+        <p className="text-sm text-[#737373] leading-5 max-w-md mb-6">
+          We've prepared the{" "}
+          <span className="font-bold text-[#0a0a0a]">
+            {interviewData.roundType}
+          </span>{" "}
+          round for{" "}
+          <span className="font-bold text-[#0a0a0a]">
+            {interviewData.jobTitle}
+          </span>
+          , estimated to take{" "}
+          <span className="font-bold text-[#0a0a0a]">
+            {interviewData.duration}
+          </span>{" "}
+          minutes.
+        </p>
 
-        <div className="flex flex-col gap-2">
-          <Label className="text-sm font-medium text-[#0a0a0a] leading-none">
-            Select Interviewer
-          </Label>
-          <div className="flex gap-2 items-center">
-            <button
-              type="button"
-              className="border border-dashed border-[#d1d1d1] rounded p-1 flex flex-col items-center gap-1 w-[70px] h-[98px]"
-            >
-              <div className="flex flex-col gap-1 h-[90px] items-center">
-                <div className="bg-[#e5e5e5] rounded w-[62px] h-[62px] relative">
-                  <Plus className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-black" />
-                </div>
-                <p className="text-xs text-[#737373] leading-none text-center w-[62px]">
-                  + Add new
-                </p>
-              </div>
-            </button>
-            {MOCK_INTERVIEWERS.map((interviewer) => (
+        {/* Interview Link Container */}
+        <div className="w-full mb-6">
+          <div className="bg-[#f5f5f5] border border-[#dcdcdc] rounded-[10px] p-4 space-y-3">
+            <label className="text-sm font-normal text-[#0a0a0a] block text-left leading-5">
+              Interview Link
+            </label>
+            <div className="flex items-center gap-3">
+              <p className="flex-1 text-sm text-[#0a0a0a] truncate text-left font-normal">
+                {interviewData.interviewLink}
+              </p>
               <button
-                key={interviewer.id}
                 type="button"
-                onClick={() => onFieldChange("interviewerId", interviewer.id)}
-                className={`border rounded p-1 flex flex-col items-center gap-1 w-[70px] h-[98px] transition-all ${
-                  formData.interviewerId === interviewer.id
-                    ? "border-[#02563d] bg-[#f0f5f2] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)]"
-                    : "border-[#d1d1d1]"
-                }`}
+                onClick={handleCopyLink}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-[#0a0a0a] bg-[#e5e5e5] hover:bg-[#d5d5d5] border border-[#e5e5e5] rounded-md transition-colors shrink-0"
               >
-                <div className="flex flex-col gap-1 h-[90px] items-center">
-                  <div className="relative rounded w-[62px] h-[62px] overflow-hidden">
-                    <img
-                      src={interviewer.image}
-                      alt={interviewer.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <p className="text-xs text-[#737373] leading-none text-center w-[62px]">
-                    {interviewer.name}
-                  </p>
-                </div>
+                <Copy className="w-4 h-4" />
+                <span>{copied ? "Copied!" : "Copy link"}</span>
               </button>
-            ))}
+            </div>
           </div>
         </div>
+
+        {/* Share Button */}
+        <Button
+          type="button"
+          onClick={() => setIsShareModalOpen(true)}
+          className="w-full h-11 px-4 bg-[#02563d] hover:bg-[#02563d]/90 text-white font-semibold rounded-[10px] shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] flex items-center justify-center gap-2"
+        >
+          <Users className="w-5 h-5" />
+          <span>Share with Applicants</span>
+        </Button>
       </div>
-    </div>
+
+      <ShareInterviewLinkModal
+        open={isShareModalOpen}
+        onOpenChange={setIsShareModalOpen}
+        interviewLink={interviewData.interviewLink}
+      />
+    </>
   );
 };
