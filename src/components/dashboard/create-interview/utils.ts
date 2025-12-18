@@ -1,4 +1,5 @@
 import type { InterviewFormData } from "./types";
+import { generateInterviewLink } from "./constants";
 
 export const createInitialFormData = (): InterviewFormData => ({
   interviewSource: "existing",
@@ -32,6 +33,7 @@ export const createInitialFormData = (): InterviewFormData => ({
   enableRecording: true,
   enableTranscription: true,
   enableFeedback: true,
+  interviewLink: undefined,
 });
 
 export const validateStep = (

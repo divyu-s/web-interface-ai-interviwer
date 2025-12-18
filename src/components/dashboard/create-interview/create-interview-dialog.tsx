@@ -21,6 +21,7 @@ import { Step3ExistingJobRoundDetails } from "./components/Step3ExistingJobRound
 import { Step4Questions } from "./components/Step4Questions";
 import { Step5Instructions } from "./components/Step5Instructions";
 import { ShareInterviewLinkModal } from "./components/ShareInterviewLinkModal";
+import { TOTAL_STEPS } from "./constants";
 
 export function CreateInterviewDialog({
   open,
@@ -36,8 +37,8 @@ export function CreateInterviewDialog({
 
   const handleNext = useCallback(() => {
     const next = step + 1;
-    if (next > 5) {
-      // Submit form
+    if (next > TOTAL_STEPS) {
+      // Submit form - in production, this would call an API
       console.log("Form submitted:", formData);
       onOpenChange(false);
       resetForm();
@@ -65,13 +66,22 @@ export function CreateInterviewDialog({
 
   const canProceed = validateStep(step, formData);
 
-  // Generate interview link for share modal
+  // Use interview link from formData if available
   const interviewLink = useMemo(() => {
-    return `https://yourcompany.com/interview/INT-${Date.now()}`;
-  }, []);
+    return formData.interviewLink || "";
+  }, [formData.interviewLink]);
 
-  const isShareModalStep =
-    step === 4 && formData.interviewSource === "existing";
+  // Determine if we should show the share modal (step 4 for existing jobs)
+  const isShareModalStep = useMemo(
+    () => step === 4 && formData.interviewSource === "existing",
+    [step, formData.interviewSource]
+  );
+
+  // Hide footer on step 3 for existing jobs (shows success screen)
+  const shouldHideFooter = useMemo(
+    () => step === 3 && formData.interviewSource === "existing",
+    [step, formData.interviewSource]
+  );
 
   const renderStepContent = () => {
     switch (step) {
@@ -123,31 +133,36 @@ export function CreateInterviewDialog({
 
           <div className="flex flex-col">{renderStepContent()}</div>
 
-          <DialogFooter className="gap-2 justify-end">
-            {step > 1 && (
+          {!shouldHideFooter && (
+            <DialogFooter className="gap-2 justify-end">
+              {step > 1 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleBack}
+                  className="h-9 px-4"
+                >
+                  Back
+                </Button>
+              )}
               <Button
                 type="button"
-                variant="outline"
-                onClick={handleBack}
-                className="h-9 px-4"
+                variant="default"
+                onClick={handleNext}
+                disabled={!canProceed}
+                className="h-9 px-4 bg-[#02563d] hover:bg-[#02563d]/90 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label={
+                  step === TOTAL_STEPS ? "Create interview" : "Go to next step"
+                }
               >
-                Back
+                {step === TOTAL_STEPS ? "Create" : "Next"}
               </Button>
-            )}
-            <Button
-              type="button"
-              variant="default"
-              onClick={handleNext}
-              disabled={!canProceed}
-              className="h-9 px-4 bg-[#02563d] hover:bg-[#02563d]/90 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] disabled:opacity-50"
-            >
-              {step === 5 ? "Create" : "Next"}
-            </Button>
-          </DialogFooter>
+            </DialogFooter>
+          )}
         </DialogContent>
       </Dialog>
 
-      {isShareModalStep && (
+      {isShareModalStep && interviewLink && (
         <ShareInterviewLinkModal
           open={open}
           onOpenChange={(isOpen) => {
