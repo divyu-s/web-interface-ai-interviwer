@@ -161,21 +161,6 @@ export function CreateInterviewDialog({
           )}
         </DialogContent>
       </Dialog>
-
-      {isShareModalStep && interviewLink && (
-        <ShareInterviewLinkModal
-          open={open}
-          onOpenChange={(isOpen) => {
-            if (!isOpen) {
-              // When modal closes, proceed to next step
-              handleNext();
-            } else {
-              onOpenChange(isOpen);
-            }
-          }}
-          interviewLink={interviewLink}
-        />
-      )}
     </>
   );
 }
