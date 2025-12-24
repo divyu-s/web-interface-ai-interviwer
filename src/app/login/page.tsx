@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { z } from "zod";
 import { Logo } from "@/components/logo";
 import { StatsPanel } from "@/components/stats-panel";
 import { Button } from "@/components/ui/button";
@@ -15,13 +17,170 @@ import {
   CardContent,
 } from "@/components/ui/card";
 
+// Zod schema for login form validation
+const loginSchema = z.object({
+  emailOrPhone: z
+    .string()
+    .min(1, "Email or phone number is required")
+    .refine(
+      (value) => {
+        // Check if it's a valid email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (emailRegex.test(value)) {
+          return true;
+        }
+        // Check if it's a valid phone number (supports various formats)
+        // Allows: +1234567890, 1234567890, (123) 456-7890, 123-456-7890, etc.
+        const phoneRegex = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$/;
+        const digitsOnly = value.replace(/[\s\-\(\)\+\.]/g, "");
+        
+        // If it looks like a phone number, check the digit count
+        if (phoneRegex.test(value) && /^[\d\s\-\(\)\+\.]+$/.test(value)) {
+          // Phone number must be exactly 10 digits
+          return digitsOnly.length === 10;
+        }
+        
+        return false;
+      },
+      {
+        message: "Please enter a valid email address or phone number",
+      }
+    )
+    .refine(
+      (value) => {
+        // Check if it's not an email (to avoid checking phone length for emails)
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (emailRegex.test(value)) {
+          return true; // Email is valid, skip phone validation
+        }
+        
+        // Extract digits only from phone number
+        const digitsOnly = value.replace(/[\s\-\(\)\+\.]/g, "");
+        
+        // If it contains digits and looks like a phone number
+        if (/^[\d\s\-\(\)\+\.]+$/.test(value)) {
+          // Phone number must not exceed 10 digits
+          return digitsOnly.length <= 10;
+        }
+        
+        return true; // Let the previous refine handle other validation
+      },
+      {
+        message: "Phone number must be exactly 10 digits",
+      }
+    ),
+  keepSignedIn: z.boolean().optional(),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
+
 export default function LoginPage() {
+  const router = useRouter();
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [keepSignedIn, setKeepSignedIn] = useState(false);
+  const [errors, setErrors] = useState<Partial<Record<keyof LoginFormData, string>>>({});
+  const [touched, setTouched] = useState<Partial<Record<keyof LoginFormData, boolean>>>({});
+
+  const validateField = (fieldName: keyof LoginFormData, value: string | boolean) => {
+    // Special handling for phone number and email validation
+    if (fieldName === "emailOrPhone" && typeof value === "string") {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const isEmail = emailRegex.test(value);
+      const containsAtSymbol = value.includes("@");
+      
+      // If user is typing an email (contains @), validate email format
+      if (containsAtSymbol && !isEmail && value.trim().length > 0) {
+        // Check if email is incomplete or invalid
+        if (value.trim().length > 0) {
+          // Validate through schema to get proper error message
+          // This will be handled by the schema validation below
+        }
+      }
+      
+      // If it's not an email, check if it's a phone number
+      if (!containsAtSymbol && !isEmail) {
+        const digitsOnly = value.replace(/[\s\-\(\)\+\.]/g, "");
+        // Check if it contains only digits and phone-like characters
+        if (/^[\d\s\-\(\)\+\.]+$/.test(value) && digitsOnly.length > 0) {
+          // If phone number exceeds 10 digits, show error immediately
+          if (digitsOnly.length > 10) {
+            setErrors((prev) => ({
+              ...prev,
+              [fieldName]: "Phone number must be exactly 10 digits",
+            }));
+            return;
+          }
+        }
+      }
+    }
+
+    const result = loginSchema.safeParse({
+      emailOrPhone: fieldName === "emailOrPhone" ? value : emailOrPhone,
+      keepSignedIn: fieldName === "keepSignedIn" ? value : keepSignedIn,
+    });
+
+    if (!result.success) {
+      // Find error for this specific field
+      const fieldError = result.error.issues.find(
+        (issue) => issue.path[0] === fieldName
+      );
+      if (fieldError) {
+        setErrors((prev) => ({
+          ...prev,
+          [fieldName]: fieldError.message,
+        }));
+      } else {
+        // Clear error if validation passes for this field
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[fieldName];
+          return newErrors;
+        });
+      }
+    } else {
+      // Clear error if validation passes
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[fieldName];
+        return newErrors;
+      });
+    }
+  };
+
+  const handleBlur = (fieldName: keyof LoginFormData) => {
+    setTouched((prev) => ({ ...prev, [fieldName]: true }));
+    if (fieldName === "emailOrPhone") {
+      validateField(fieldName, emailOrPhone);
+    }
+  };
 
   const handleSendCode = () => {
+    // Mark all fields as touched
+    setTouched({ emailOrPhone: true, keepSignedIn: true });
+
+    // Validate form data
+    const result = loginSchema.safeParse({
+      emailOrPhone,
+      keepSignedIn,
+    });
+
+    if (!result.success) {
+      // Extract field errors
+      const fieldErrors: Partial<Record<keyof LoginFormData, string>> = {};
+      result.error.issues.forEach((issue) => {
+        if (issue.path[0]) {
+          fieldErrors[issue.path[0] as keyof LoginFormData] = issue.message;
+        }
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    // Validation passed, proceed with sending code
     console.log("Sending verification code to:", emailOrPhone);
-    // In a real app, this would send the code and redirect to verification
+    // In a real app, this would send the code via API call
+    // For now, navigate to verification page
+    router.push("/verification");
   };
 
   return (
@@ -53,8 +212,42 @@ export default function LoginPage() {
                     id="email-or-phone"
                     type="text"
                     placeholder="Email or phone number"
+                    required
                     value={emailOrPhone}
-                    onChange={(e) => setEmailOrPhone(e.target.value)}
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      setEmailOrPhone(newValue);
+                      
+                      // Check if it's an email or phone number
+                      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                      const isEmail = emailRegex.test(newValue);
+                      
+                      // Check if user is typing an email (contains @ symbol)
+                      const containsAtSymbol = newValue.includes("@");
+                      
+                      if (containsAtSymbol || isEmail) {
+                        // Validate emails immediately while typing
+                        validateField("emailOrPhone", newValue);
+                      } else {
+                        // Check if it's a phone number
+                        const digitsOnly = newValue.replace(/[\s\-\(\)\+\.]/g, "");
+                        // If it looks like a phone number (contains digits)
+                        if (/^[\d\s\-\(\)\+\.]+$/.test(newValue) && digitsOnly.length > 0) {
+                          // Validate immediately for phone numbers
+                          validateField("emailOrPhone", newValue);
+                        } else if (touched.emailOrPhone) {
+                          // Validate if field has been touched
+                          validateField("emailOrPhone", newValue);
+                        } else {
+                          // Clear error when user starts typing if not touched yet
+                          if (errors.emailOrPhone) {
+                            setErrors((prev) => ({ ...prev, emailOrPhone: undefined }));
+                          }
+                        }
+                      }
+                    }}
+                    onBlur={() => handleBlur("emailOrPhone")}
+                    error={errors.emailOrPhone}
                   />
 
                   <Checkbox
