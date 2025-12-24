@@ -2,56 +2,102 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { z } from 'zod'
 import { Logo } from '@/components/logo'
 import { StatsPanel } from '@/components/stats-panel'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 
+// Zod schema for verification code validation
+const verificationSchema = z.object({
+  verificationCode: z
+    .string()
+    .min(1, "Verification code is required")
+    .length(6, "Verification code must be exactly 6 digits")
+    .regex(/^\d+$/, "Verification code must contain only numbers"),
+})
+
+type VerificationFormData = z.infer<typeof verificationSchema>
+
 export default function VerificationPage() {
   const [verificationCode, setVerificationCode] = useState('')
+  const [errors, setErrors] = useState<Partial<Record<keyof VerificationFormData, string>>>({})
+  const [touched, setTouched] = useState<Partial<Record<keyof VerificationFormData, boolean>>>({})
+
+  const validateField = (fieldName: keyof VerificationFormData, value: string) => {
+    const result = verificationSchema.safeParse({
+      verificationCode: fieldName === "verificationCode" ? value : verificationCode,
+    })
+
+    if (!result.success) {
+      const fieldError = result.error.issues.find(
+        (issue) => issue.path[0] === fieldName
+      )
+      if (fieldError) {
+        setErrors((prev) => ({
+          ...prev,
+          [fieldName]: fieldError.message,
+        }))
+      } else {
+        setErrors((prev) => {
+          const newErrors = { ...prev }
+          delete newErrors[fieldName]
+          return newErrors
+        })
+      }
+    } else {
+      setErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[fieldName]
+        return newErrors
+      })
+    }
+  }
+
+  const handleBlur = (fieldName: keyof VerificationFormData) => {
+    setTouched((prev) => ({ ...prev, [fieldName]: true }))
+    if (fieldName === "verificationCode") {
+      validateField(fieldName, verificationCode)
+    }
+  }
 
   const handleVerify = () => {
+    // Mark field as touched
+    setTouched({ verificationCode: true })
+
+    // Validate form data
+    const result = verificationSchema.safeParse({
+      verificationCode,
+    })
+
+    if (!result.success) {
+      // Extract field errors
+      const fieldErrors: Partial<Record<keyof VerificationFormData, string>> = {}
+      result.error.issues.forEach((issue) => {
+        if (issue.path[0]) {
+          fieldErrors[issue.path[0] as keyof VerificationFormData] = issue.message
+        }
+      })
+      setErrors(fieldErrors)
+      return
+    }
+
+    // Validation passed, proceed with verification
     console.log('Verifying code:', verificationCode)
     // In a real app, this would verify the code and log the user in
   }
 
   return (
     <div className="min-h-screen bg-[#fafafa]">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-sm border-b border-[rgba(0,0,0,0.1)]">
-        <div className="px-8 h-[72px] flex items-center justify-between max-w-[1440px] mx-auto">
-          <Logo />
-          
-          <nav className="hidden md:flex items-center gap-8">
-            <Link href="#features" className="text-sm text-[#0a0a0a] hover:text-[#02563d] transition-colors">
-              Features
-            </Link>
-            <Link href="#how-it-works" className="text-sm text-[#0a0a0a] hover:text-[#02563d] transition-colors">
-              How it Works
-            </Link>
-            <Link href="#pricing" className="text-sm text-[#0a0a0a] hover:text-[#02563d] transition-colors">
-              Pricing
-            </Link>
-            <Link href="#product-flow" className="text-sm text-[#0a0a0a] hover:text-[#02563d] transition-colors">
-              Product Flow
-            </Link>
-            <Link href="#product-spec" className="text-sm text-[#0a0a0a] hover:text-[#02563d] transition-colors">
-              Product Spec
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <Button variant="secondary">Free Trial</Button>
-            <Button variant="default">Sign In</Button>
-          </div>
-        </div>
-      </header>
-
       {/* Main Content */}
-      <div className="pt-[73px] flex">
-        {/* Left Side - Verification Form */}
-        <div className="flex-1 flex items-center justify-center p-8 min-h-[calc(100vh-73px)]">
+      <div className="flex min-h-screen">
+        {/* Left Side - Stats Panel */}
+        <div className="hidden lg:block w-1/2 h-screen sticky top-0">
+          <StatsPanel />
+        </div>
+        {/* Right Side - Verification Form */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 min-h-screen">
           <div className="w-full max-w-md flex flex-col gap-8">
             <Logo />
 
@@ -68,8 +114,22 @@ export default function VerificationPage() {
                     id="verification-code"
                     type="text"
                     placeholder="000000"
+                    required
                     value={verificationCode}
-                    onChange={(e) => setVerificationCode(e.target.value)}
+                    onChange={(e) => {
+                      const newValue = e.target.value.replace(/\D/g, '') // Only allow digits
+                      setVerificationCode(newValue)
+                      
+                      // Validate immediately while typing if field has been touched
+                      if (touched.verificationCode) {
+                        validateField("verificationCode", newValue)
+                      } else if (errors.verificationCode) {
+                        // Clear error when user starts typing if not touched yet
+                        setErrors((prev) => ({ ...prev, verificationCode: undefined }))
+                      }
+                    }}
+                    onBlur={() => handleBlur("verificationCode")}
+                    error={errors.verificationCode}
                     maxLength={6}
                   />
 
@@ -94,17 +154,42 @@ export default function VerificationPage() {
                   {/* Social Login Buttons */}
                   <div className="grid grid-cols-2 gap-3">
                     <Button variant="social" className="w-full">
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M15.68 8.18182C15.68 7.61455 15.6291 7.06909 15.5345 6.54545H8V9.64364H12.3055C12.1164 10.64 11.5491 11.4836 10.6982 12.0509V14.0655H13.2945C14.8073 12.6691 15.68 10.6182 15.68 8.18182Z" fill="#4285F4"/>
-                        <path d="M8 16C10.16 16 11.9709 15.2873 13.2945 14.0655L10.6982 12.0509C9.98545 12.5309 9.07636 12.8218 8 12.8218C5.91636 12.8218 4.15273 11.4109 3.52 9.52H0.858182V11.5927C2.17455 14.2036 4.87273 16 8 16Z" fill="#34A853"/>
-                        <path d="M3.52 9.52C3.36 9.04 3.26909 8.52727 3.26909 8C3.26909 7.47273 3.36 6.96 3.52 6.48V4.40727H0.858182C0.312727 5.49091 0 6.70545 0 8C0 9.29455 0.312727 10.5091 0.858182 11.5927L3.52 9.52Z" fill="#FBBC05"/>
-                        <path d="M8 3.17818C9.17818 3.17818 10.2255 3.58545 11.0418 4.37091L13.3527 2.06C11.9673 0.792727 10.1564 0 8 0C4.87273 0 2.17455 1.79636 0.858182 4.40727L3.52 6.48C4.15273 4.58909 5.91636 3.17818 8 3.17818Z" fill="#EA4335"/>
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <path
+                          d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                          fill="#1C1C1C"
+                        />
+                        <path
+                          d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                          fill="#1C1C1C"
+                        />
+                        <path
+                          d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                          fill="#1C1C1C"
+                        />
+                        <path
+                          d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                          fill="#1C1C1C"
+                        />
                       </svg>
                       Google
                     </Button>
                     <Button variant="social" className="w-full">
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M16 8C16 3.58172 12.4183 0 8 0C3.58172 0 0 3.58172 0 8C0 11.993 2.92547 15.3027 6.75 15.9028V10.3125H4.71875V8H6.75V6.2375C6.75 4.2325 7.94438 3.125 9.77172 3.125C10.6467 3.125 11.5625 3.28125 11.5625 3.28125V5.25H10.5538C9.56 5.25 9.25 5.86672 9.25 6.5V8H11.4688L11.1141 10.3125H9.25V15.9028C13.0745 15.3027 16 11.993 16 8Z" fill="#1877F2"/>
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <path
+                          d="M24 12c0-6.627-5.373-12-12-12S0 5.373 0 12c0 5.99 4.388 10.954 10.125 11.854V15.47H7.078V12h3.047V9.356c0-3.007 1.792-4.668 4.533-4.668 1.312 0 2.686.234 2.686.234v2.953H15.83c-1.491 0-1.956.925-1.956 1.874V12h3.328l-.532 3.469h-2.796v8.385C19.612 22.954 24 17.99 24 12z"
+                          fill="#1C1C1C"
+                        />
                       </svg>
                       Facebook
                     </Button>
@@ -112,19 +197,16 @@ export default function VerificationPage() {
                 </CardContent>
               </Card>
 
-              <div className="flex items-center justify-between px-20">
-                <p className="text-sm text-[#45556c] text-center">Don&apos;t have an account?</p>
-                <Button variant="ghost">
+              <div className="flex items-center justify-center gap-1 mt-2">
+                <span className="text-sm text-[#45556c]">
+                  Don&apos;t have an account?
+                </span>
+                <Link href="/signup" className="text-sm text-[#02563d] font-medium hover:underline">
                   Create an account
-                </Button>
+                </Link>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Right Side - Stats Panel */}
-        <div className="hidden lg:block w-[614px] h-[calc(100vh-73px)] sticky top-[73px]">
-          <StatsPanel />
         </div>
       </div>
     </div>

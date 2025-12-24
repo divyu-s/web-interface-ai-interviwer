@@ -5,7 +5,8 @@ import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import {
   ArrowRight,
   Zap,
@@ -15,7 +16,7 @@ import {
   Shield,
   CheckCircle,
 } from "lucide-react";
-import { Header } from "@/components/header";
+import { StatsPanel } from "@/components/stats-panel";
 
 export default function SignupPage() {
   const [step, setStep] = useState(1);
@@ -24,6 +25,7 @@ export default function SignupPage() {
     lastName: "",
     email: "",
     phone: "",
+    designation: "",
     companyName: "",
     website: "",
     industry: "",
@@ -75,14 +77,16 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <Header />
-
       {/* Main Content */}
-      <div className="flex pt-[73px] min-h-screen">
-        {/* Left Side - Form */}
-        <div className="flex-1 flex items-center justify-center px-8 py-12 bg-[#fafafa]">
-          <div className="w-full max-w-[448px] space-y-8">
+      <div className="flex min-h-screen">
+
+        {/* Left Side - Stats Panel */}
+        <div className="hidden lg:block w-1/2 h-screen sticky top-0">
+        <StatsPanel />
+        </div>
+        {/* Right Side - Form */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center px-8 py-12 bg-[#fafafa]">
+          <div className="w-full max-w-[448px] space-y-4">
             <Logo />
 
             {/* Progress Indicator */}
@@ -168,6 +172,13 @@ export default function SignupPage() {
                       value={formData.phone}
                       onChange={handleInputChange}
                     />
+                    <Input
+                      label="Designation"
+                      name="designation"
+                      placeholder="Founder"
+                      value={formData.designation}
+                      onChange={handleInputChange}
+                    />
                   </>
                 ) : (
                   <>
@@ -186,20 +197,42 @@ export default function SignupPage() {
                       value={formData.website}
                       onChange={handleInputChange}
                     />
-                    <Select
-                      label="Industry"
-                      name="industry"
-                      options={industries}
-                      value={formData.industry}
-                      onChange={handleInputChange}
-                    />
-                    <Select
-                      label="Organisation size"
-                      name="companySize"
-                      options={companySizes}
-                      value={formData.companySize}
-                      onChange={handleInputChange}
-                    />
+                    <div className="space-y-1.5">
+                      <Label className="text-sm font-medium text-[#0f1728]">Industry</Label>
+                      <Select
+                        value={formData.industry}
+                        onValueChange={(value) => setFormData({ ...formData, industry: value })}
+                      >
+                        <SelectTrigger className="w-full h-10 border-[#cfd4dc] rounded-lg">
+                          <SelectValue placeholder="Select industry" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {industries.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-sm font-medium text-[#0f1728]">Organisation size</Label>
+                      <Select
+                        value={formData.companySize}
+                        onValueChange={(value) => setFormData({ ...formData, companySize: value })}
+                      >
+                        <SelectTrigger className="w-full h-10 border-[#cfd4dc] rounded-lg">
+                          <SelectValue placeholder="Select company size" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {companySizes.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </>
                 )}
 
@@ -270,113 +303,24 @@ export default function SignupPage() {
               </div>
             </div>
 
-            <div className="text-center text-sm text-[#45556c]">
-              Already have an account?{" "}
+            <div className="flex flex-col items-center gap-4">
+              <div className="text-center text-sm text-[#45556c]">
+                Already have an account?{" "}
+                <Link
+                  href="/login"
+                  className="text-[#02563d] font-medium hover:underline"
+                >
+                  Sign In
+                </Link>
+              </div>
+
               <Link
-                href="/login"
-                className="text-[#02563d] font-medium hover:underline"
+                href="#"
+                className="inline-flex items-center gap-2 text-sm text-[#02563d] font-medium hover:underline"
               >
-                Sign In
+                <Users className="w-4 h-4" />
+                Invite team member
               </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Side - Feature Panel */}
-        <div className="hidden lg:flex lg:w-[614px] bg-linear-to-b from-[#02563d] to-[#034d35] p-12 flex-col gap-12 overflow-auto">
-          <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-white/20 border border-white/30">
-              <Zap className="w-3 h-3 text-white" />
-              <span className="text-xs font-medium text-white">
-                AI-Powered Hiring Platform
-              </span>
-            </div>
-
-            <h2 className="text-[36px] font-normal leading-[40px] text-white">
-              Transform Your Hiring with Intelligent AI Interviews
-            </h2>
-
-            <p className="text-lg text-white/90 leading-7">
-              Join 500+ companies conducting 10,000+ AI interviews monthly.
-              Screen candidates faster, reduce bias, and make data-driven hiring
-              decisions.
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            <div className="bg-white/10 border border-white/20 rounded-[10px] p-4 flex items-start gap-4">
-              <div className="w-10 h-10 bg-white/20 rounded-[10px] flex items-center justify-center shrink-0">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="text-base font-normal text-white mb-1">
-                  Adaptive AI Interviewers
-                </h3>
-                <p className="text-sm text-white/80">
-                  Smart follow-up questions based on candidate responses
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-white/10 border border-white/20 rounded-[10px] p-4 flex items-start gap-4">
-              <div className="w-10 h-10 bg-white/20 rounded-[10px] flex items-center justify-center shrink-0">
-                <Users className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="text-base font-normal text-white mb-1">
-                  Multi-Modal Interviews
-                </h3>
-                <p className="text-sm text-white/80">
-                  Text, voice, or video - let candidates choose
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-white/10 border border-white/20 rounded-[10px] p-4 flex items-start gap-4">
-              <div className="w-10 h-10 bg-white/20 rounded-[10px] flex items-center justify-center shrink-0">
-                <BarChart3 className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="text-base font-normal text-white mb-1">
-                  Instant Scoring & Insights
-                </h3>
-                <p className="text-sm text-white/80">
-                  AI-powered evaluation with detailed scorecards
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-white/10 border border-white/20 rounded-[10px] p-4 flex items-start gap-4">
-              <div className="w-10 h-10 bg-white/20 rounded-[10px] flex items-center justify-center shrink-0">
-                <Shield className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="text-base font-normal text-white mb-1">
-                  Bias-Free Assessment
-                </h3>
-                <p className="text-sm text-white/80">
-                  Fair, consistent evaluation for every candidate
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <div className="text-[30px] font-normal text-white mb-1">
-                500+
-              </div>
-              <div className="text-sm text-white/80">Companies</div>
-            </div>
-            <div>
-              <div className="text-[30px] font-normal text-white mb-1">
-                10K+
-              </div>
-              <div className="text-sm text-white/80">Interviews</div>
-            </div>
-            <div>
-              <div className="text-[30px] font-normal text-white mb-1">87%</div>
-              <div className="text-sm text-white/80">Time Saved</div>
             </div>
           </div>
         </div>
