@@ -1,8 +1,7 @@
 import { useState, useCallback } from "react";
 import type { InterviewFormData } from "../types";
 import { calculateNextStep, calculatePreviousStep } from "../utils";
-
-const TOTAL_STEPS = 5;
+import { TOTAL_STEPS } from "../constants";
 
 export const useStepNavigation = (
   interviewSource: InterviewFormData["interviewSource"]

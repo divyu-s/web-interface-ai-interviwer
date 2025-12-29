@@ -44,6 +44,9 @@ export interface InterviewFormData {
   enableRecording: boolean;
   enableTranscription: boolean;
   enableFeedback: boolean;
+
+  // Generated interview link (created when interview is successfully created)
+  interviewLink?: string;
 }
 
 export interface CreateInterviewDialogProps {
