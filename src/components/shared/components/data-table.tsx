@@ -100,8 +100,8 @@ function DataTablePagination({
   if (pagination.total === 0) return null;
 
   // Calculate current page from offset
-  const currentPage = Math.floor(currentOffset / pagination.limit) + 1;
-  const totalPages = Math.ceil(pagination.total / pagination.limit);
+  const currentPage = Math.floor(currentOffset / pagination?.limit) + 1;
+  const totalPages = Math.ceil(pagination?.total / pagination?.limit);
 
   // Calculate which page numbers to show
   const pageNumbers = useMemo(() => {
@@ -157,29 +157,29 @@ function DataTablePagination({
 
   const handlePrevious = () => {
     if (pagination.previousOffset !== null && pagination.previousOffset >= 0) {
-      onPaginationChange(pagination.previousOffset);
+      onPaginationChange(pagination?.previousOffset);
     }
   };
 
   const handleNext = () => {
     if (pagination.nextOffset !== null) {
-      onPaginationChange(pagination.nextOffset);
+      onPaginationChange(pagination?.nextOffset);
     }
   };
 
   const handlePageClick = (page: number) => {
-    const newOffset = (page - 1) * pagination.limit;
+    const newOffset = (page - 1) * pagination?.limit;
     onPaginationChange(newOffset);
   };
 
   const isPreviousDisabled =
-    pagination.previousOffset === null ||
-    pagination.previousOffset < 0 ||
+    pagination?.previousOffset === null ||
+    pagination?.previousOffset < 0 ||
     isLoading;
 
   const isNextDisabled =
-    (pagination.nextOffset && pagination.nextOffset >= pagination.total) ||
-    pagination.nextOffset === null ||
+    (pagination?.nextOffset && pagination?.nextOffset >= pagination?.total) ||
+    pagination?.nextOffset === null ||
     isLoading;
 
   return (

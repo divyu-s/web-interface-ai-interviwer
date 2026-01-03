@@ -22,16 +22,6 @@ export interface JobFormData {
   skills: string[];
 }
 
-export interface Job {
-  id: string;
-  position: string;
-  status: "active" | "draft" | "closed";
-  noOfOpening: number;
-  applicants: number;
-  interviews: number;
-  created: string;
-}
-
 export interface JobStat {
   label: string;
   value: string | number;
