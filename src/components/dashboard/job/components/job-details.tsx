@@ -261,7 +261,7 @@ export default function JobDetails() {
                 <div className="bg-white rounded-lg shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] py-6 pl-6 pr-0">
                   <Skeleton className="h-4 w-32 mb-3 bg-[#e5e5e5]" />
                   <div className="space-y-2">
-                    {Array.from({ length: 4 }).map((_, index) => (
+                    {Array.from({ length: 3 }).map((_, index) => (
                       <div key={index} className="flex items-center gap-2 h-6">
                         <Skeleton className="w-4 h-4 bg-[#e5e5e5] rounded-full" />
                         <Skeleton className="h-4 w-32 bg-[#e5e5e5]" />
@@ -277,7 +277,7 @@ export default function JobDetails() {
                     <Skeleton className="h-4 w-32 bg-[#e5e5e5]" />
                   </div>
                   <div className="px-6 pt-[30px] space-y-3">
-                    {Array.from({ length: 3 }).map((_, index) => (
+                    {Array.from({ length: 2 }).map((_, index) => (
                       <div key={index}>
                         <Skeleton className="h-4 w-20 mb-1 bg-[#e5e5e5]" />
                         <Skeleton className="h-5 w-24 bg-[#e5e5e5]" />
