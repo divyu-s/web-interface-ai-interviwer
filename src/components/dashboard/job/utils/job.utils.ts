@@ -212,12 +212,9 @@ export const transformAPIResponseToJobDetail = (
   };
 };
 
-export const transformToAPIPayload = (
-  values: JobFormData,
-  existingJobId?: string
-) => {
+export const transformToAPIPayload = (values: JobFormData) => {
   // Use existing jobId if provided (for edit), otherwise generate a new one
-  const jobId = existingJobId || Math.floor(Math.random() * 1000) + 100;
+  const jobId = Math.floor(Math.random() * 1000) + 100;
 
   // Transform skills to API format
   const requiredSkills = values.skills.map((skill) => [
@@ -239,81 +236,67 @@ export const transformToAPIPayload = (
       key: "title",
       value: values.title,
     },
-    ...(values.industry
-      ? [
-          {
-            propertyId: "695257bfc9ba83a076aac41c",
-            key: "industry",
-            value: mapIndustryToAPI(values.industry),
-          },
-        ]
-      : []),
-    ...(values.jobLevel
-      ? [
-          {
-            propertyId: "695257f8c9ba83a076aac41f",
-            key: "jobLevel",
-            value: mapJobLevelToAPI(values.jobLevel),
-          },
-        ]
-      : []),
-    ...(values.jobType
-      ? [
-          {
-            propertyId: "69525830c9ba83a076aac422",
-            key: "jobType",
-            value: mapJobTypeToAPI(values.jobType),
-          },
-        ]
-      : []),
+
+    {
+      propertyId: "695257bfc9ba83a076aac41c",
+      key: "industry",
+      value: values.industry,
+    },
+
+    {
+      propertyId: "695257f8c9ba83a076aac41f",
+      key: "jobLevel",
+      value: values.jobLevel,
+    },
+
+    {
+      propertyId: "69525830c9ba83a076aac422",
+      key: "jobType",
+      value: values.jobType,
+    },
+    ,
     {
       propertyId: "69525880c9ba83a076aac425",
       key: "minExp",
-      value: values.minExperience || 0,
+      value: values.minExperience,
     },
     {
       propertyId: "69525898c9ba83a076aac427",
       key: "maxExp",
-      value: values.maxExperience || 0,
+      value: values.maxExperience,
     },
     {
       propertyId: "695258ccc9ba83a076aac42a",
       key: "description",
       value: values.description,
     },
-    ...(values.noOfOpenings
-      ? [
-          {
-            propertyId: "695258e5c9ba83a076aac42c",
-            key: "numOfOpenings",
-            value: values.noOfOpenings || 1,
-          },
-        ]
-      : []),
+    {
+      propertyId: "695258e5c9ba83a076aac42c",
+      key: "numOfOpenings",
+      value: values.noOfOpenings,
+    },
     {
       propertyId: "6952595cc9ba83a076aac431",
       key: "status",
-      value: mapStatusToAPI(values.status),
+      value: values.status,
     },
     {
       propertyId: "6952598ec9ba83a076aac432",
       key: "accessibility",
       value: "Private",
+      //TODO: Needs to Change in future
     },
     {
       propertyId: "6957547fc9ba83a076aac57c",
       key: "formUser",
       value: ["6936a4d92276e3fc3ac7b13b"],
+      //TODO: Needs to Change in future
     },
-    ...(values.skills.length > 0
-      ? [
-          {
-            propertyId: "695259d0c9ba83a076aac435",
-            key: "requiredSkills",
-            value: requiredSkills,
-          },
-        ]
-      : []),
+    {
+      propertyId: "695259d0c9ba83a076aac435",
+      key: "requiredSkills",
+      value: requiredSkills,
+    },
   ];
 
   return {
@@ -403,102 +386,4 @@ export const validate = (values: JobFormData) => {
   }
 
   return errors;
-};
-
-export const mapIndustryToAPI = (industry: string): string => {
-  const industryMap: Record<string, string> = {
-    engineering: "IT/Software",
-    technical: "IT/Software",
-    product: "Product",
-    design: "Design",
-    marketing: "Marketing",
-    sales: "Sales",
-    hr: "Human Resources",
-  };
-  return industryMap[industry] || "IT/Software";
-};
-
-export const mapJobLevelToAPI = (jobLevel: string): string => {
-  const levelMap: Record<string, string> = {
-    junior: "Entry",
-    mid: "Mid",
-    senior: "Senior",
-    lead: "Lead",
-    manager: "Manager",
-    director: "Director",
-  };
-  return levelMap[jobLevel] || "Mid";
-};
-
-export const mapJobTypeToAPI = (jobType: string): string => {
-  const typeMap: Record<string, string> = {
-    "full-time": "Full-time",
-    "part-time": "Part-time",
-    contract: "Contract",
-    intern: "Intern",
-  };
-  return typeMap[jobType] || "Full-time";
-};
-
-export const mapStatusToAPI = (status: string): string => {
-  return status.charAt(0).toUpperCase() + status.slice(1);
-};
-
-// Reverse mapping functions for API to form data
-export const mapIndustryFromAPI = (industry: string): string => {
-  const industryMap: Record<string, string> = {
-    "IT/Software": "technical",
-    "it/software": "technical",
-    Engineering: "engineering",
-    engineering: "engineering",
-    Product: "product",
-    product: "product",
-    Design: "design",
-    design: "design",
-    Marketing: "marketing",
-    marketing: "marketing",
-    Sales: "sales",
-    sales: "sales",
-    "Human Resources": "hr",
-    "human resources": "hr",
-    HR: "hr",
-    hr: "hr",
-  };
-  return industryMap[industry] || "technical";
-};
-
-export const mapJobLevelFromAPI = (jobLevel: string): string => {
-  const levelMap: Record<string, string> = {
-    Entry: "junior",
-    entry: "junior",
-    Mid: "mid",
-    mid: "mid",
-    Senior: "senior",
-    senior: "senior",
-    Lead: "lead",
-    lead: "lead",
-    Manager: "manager",
-    manager: "manager",
-    Director: "director",
-    director: "director",
-  };
-  return levelMap[jobLevel] || "mid";
-};
-
-export const mapJobTypeFromAPI = (jobType: string): string => {
-  const typeMap: Record<string, string> = {
-    "Full-time": "full-time",
-    "full-time": "full-time",
-    "Part-time": "part-time",
-    "part-time": "part-time",
-    Contract: "contract",
-    contract: "contract",
-    Intern: "intern",
-    intern: "intern",
-  };
-  return typeMap[jobType] || "full-time";
-};
-
-export const mapStatusFromAPI = (status: string): string => {
-  return status.toLowerCase();
 };

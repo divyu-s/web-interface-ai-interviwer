@@ -506,8 +506,8 @@ export function CreateJobModal({
                   ? "Updating..."
                   : "Creating..."
                 : isEditMode
-                ? "Update job"
-                : "Create job"}
+                ? "Update Job"
+                : "Create Job"}
             </Button>
           </DialogFooter>
         </form>
