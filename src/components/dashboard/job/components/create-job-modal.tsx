@@ -29,14 +29,7 @@ import { Badge } from "@/components/ui/badge";
 import { jobService } from "../services/job.service";
 import { CreateJobModalProps, JobFormData } from "../interfaces/job.interface";
 import { transformToAPIPayload, validate } from "../utils/job.utils";
-import {
-  domainOptions,
-  experienceOptions,
-  jobLevelOptions,
-  openingsOptions,
-  statusOptions,
-  userTypeOptions,
-} from "../constants/job.constants";
+import { experienceOptions, openingsOptions } from "../constants/job.constants";
 
 export function CreateJobModal({
   open,
@@ -444,9 +437,9 @@ export function CreateJobModal({
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
-                    {statusOptions?.map((option) => (
-                      <SelectItem key={option?.value} value={option?.value}>
-                        {option?.label}
+                    {mappingValues?.status?.map((option, index) => (
+                      <SelectItem key={index} value={option}>
+                        {option}
                       </SelectItem>
                     ))}
                   </SelectContent>

@@ -15,7 +15,6 @@ export const jobsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(fetchFormProperties.fulfilled, (state, action) => {
-      console.log(action.payload);
       state.mappingValues = action.payload;
     });
   },

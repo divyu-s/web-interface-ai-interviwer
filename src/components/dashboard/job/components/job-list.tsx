@@ -265,7 +265,7 @@ export default function JobList() {
       <DataTable<JobDetail>
         data={jobs}
         columns={columns}
-        getRowId={(job) => job?.jobId}
+        getRowId={(job) => job?.id}
         pagination={pagination}
         currentOffset={currentOffset}
         onPaginationChange={setCurrentOffset}

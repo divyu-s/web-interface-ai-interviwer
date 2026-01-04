@@ -1,31 +1,5 @@
 import { Applicant, JobStat, Round } from "../interfaces/job.interface";
 
-export const domainOptions = [
-  { value: "engineering", label: "Engineering" },
-  { value: "technical", label: "Technical" },
-  { value: "product", label: "Product" },
-  { value: "design", label: "Design" },
-  { value: "marketing", label: "Marketing" },
-  { value: "sales", label: "Sales" },
-  { value: "hr", label: "Human Resources" },
-];
-
-export const jobLevelOptions = [
-  { value: "junior", label: "Junior" },
-  { value: "mid", label: "Mid" },
-  { value: "senior", label: "Senior" },
-  { value: "lead", label: "Lead" },
-  { value: "manager", label: "Manager" },
-  { value: "director", label: "Director" },
-];
-
-export const userTypeOptions = [
-  { value: "full-time", label: "Full time" },
-  { value: "part-time", label: "Part time" },
-  { value: "contract", label: "Contract" },
-  { value: "intern", label: "Intern" },
-];
-
 export const experienceOptions = [
   { value: "0", label: "0 year" },
   { value: "1", label: "1 year" },
@@ -47,32 +21,10 @@ export const openingsOptions = [
   { value: "10", label: "10" },
 ];
 
-export const statusOptions = [
-  { value: "active", label: "Active" },
-  { value: "draft", label: "Draft" },
-  { value: "closed", label: "Closed" },
-];
-
 export const statusStyles = {
   active: "bg-[#def2eb] text-[#0e4230] border-transparent",
   draft: "bg-[#e5e5e5] text-[#000000] border-transparent",
   closed: "bg-[#fcefec] text-[#d92d20] border-transparent",
-};
-
-export const mockJobData = {
-  id: "1",
-  title: "Senior Product Manager",
-  status: "active" as const,
-  department: "Engineering",
-  type: "Full-time",
-  postedDate: "Nov 15, 2025",
-  description:
-    "We are looking for an experienced product manager to join our team and help build amazing user experiences. We are looking for an experienced product manager to join our team and help build amazing user experiences.",
-  skills: ["Collaboration", "Problem solving"],
-  jobLevel: "Senior",
-  userType: "Full-time",
-  experience: "5-8 years",
-  salaryRange: "10 LPA - 12 LPA",
 };
 
 export const stats: JobStat[] = [
