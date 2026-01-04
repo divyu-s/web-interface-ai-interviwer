@@ -65,6 +65,7 @@ import { jobService } from "@/components/dashboard/job/services/job.service";
 import { transformAPIResponseToJobDetail } from "@/components/dashboard/job/utils/job.utils";
 
 import { CreateJobModal } from "./create-job-modal";
+import { useAppSelector } from "@/store/hooks";
 
 export const stats: JobStat[] = [
   { label: "Total Applicants", value: 143, icon: "applicants" },
@@ -102,6 +103,8 @@ export default function JobDetails() {
   });
   const [job, setJob] = useState<JobDetail | null>(null);
   const [isLoadingJob, setIsLoadingJob] = useState(true);
+
+  const { mappingValues } = useAppSelector((state) => state.jobs);
 
   // Fetch job detail
   useEffect(() => {
@@ -842,6 +845,7 @@ export default function JobDetails() {
         onSuccess={() => {
           fetchJobDetail();
         }}
+        mappingValues={mappingValues}
         isEditMode={true}
         jobDetail={{
           title: job?.title || "",
