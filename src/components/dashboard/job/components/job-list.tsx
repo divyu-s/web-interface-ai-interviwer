@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   Plus,
   Search,
-  ListFilter,
   MoreHorizontal,
   Eye,
   Pencil,
@@ -24,6 +23,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  JobFilterDropdown,
+  JobFilterState,
+} from "@/components/shared/components/job-filter-dropdown";
 
 import { JobDetail, JobFormData } from "../interfaces/job.interface";
 import { CreateJobModal } from "./create-job-modal";
@@ -48,6 +51,9 @@ export default function JobList() {
   const PAGE_LIMIT = 10;
   const [currentOffset, setCurrentOffset] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [appliedFilters, setAppliedFilters] = useState<JobFilterState>({
+    status: [],
+  });
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [jobDetail, setJobDetail] = useState<JobFormData | null>(null);
@@ -56,7 +62,7 @@ export default function JobList() {
 
   useEffect(() => {
     fetchJobs();
-  }, [currentOffset]);
+  }, [currentOffset, appliedFilters, searchQuery]);
 
   const fetchJobs = async () => {
     setIsLoading(true);
@@ -68,13 +74,29 @@ export default function JobList() {
       limit: PAGE_LIMIT,
     });
     try {
-      const params = {
+      const params: Record<string, any> = {
         limit: PAGE_LIMIT,
         offset: currentOffset,
       };
+
+      if (searchQuery) {
+        params["query"] = searchQuery;
+      }
+
       const response = await jobService.getJobOpenings(params, {
         filters: {
-          $and: [],
+          $and: [
+            ...(appliedFilters.status.length > 0
+              ? [
+                  {
+                    key: "#.records.status",
+                    operator: "$in",
+                    value: appliedFilters.status,
+                    type: "select",
+                  },
+                ]
+              : []),
+          ],
         },
         appId: "69521cd1c9ba83a076aac3ae",
       });
@@ -223,29 +245,33 @@ export default function JobList() {
     setIsEditModalOpen(true);
   };
 
+  const handleApplyFilters = (filters: JobFilterState) => {
+    setAppliedFilters(filters);
+    setCurrentOffset(0); // Reset to first page when filters are applied
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex items-center justify-between">
-        <div className="relative w-[245px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-[10.667px] w-[10.667px] text-[#737373]" />
-          <Input
+        <div className="flex items-center gap-2 px-3 py-2.5 border-b border-[#e5e5e5] w-[245px]">
+          <Search className="w-4 h-4 text-[#737373]" />
+          <input
+            type="text"
             placeholder="Search"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e?.target?.value)}
-            className="pl-8 border-0 border-b border-[#e5e5e5] rounded-none focus-visible:ring-0 focus-visible:border-[#02563d] shadow-none"
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1 text-sm text-[#737373] bg-transparent border-0 outline-none placeholder:text-[#737373]"
           />
         </div>
 
         {/* Search & Actions */}
         <div className="flex items-center gap-3">
-          {/* Search Input */}
-
           {/* Filters Button */}
-          <Button variant="secondary" size="default">
-            <ListFilter className="w-4 h-4" />
-            Filters
-          </Button>
+          <JobFilterDropdown
+            onApplyFilters={handleApplyFilters}
+            initialFilters={appliedFilters}
+          />
 
           {/* Create Job Button */}
           <Button
