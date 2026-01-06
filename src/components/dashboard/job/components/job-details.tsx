@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams } from "next/navigation";
 import {
   Building2,
@@ -15,6 +15,7 @@ import {
   X,
   Eye,
   MoreVertical,
+  MoreHorizontal,
   Briefcase,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -42,6 +43,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { StatusTag } from "@/components/ui/status-tag";
 import { CreateRoundModal } from "@/components/dashboard/create-round-modal";
+import { DataTable, Column } from "@/components/shared/components/data-table";
+import { DataTableSkeleton } from "@/components/shared/components/data-table-skeleton";
 import {
   Applicant,
   JobDetail,
@@ -54,7 +57,10 @@ import {
 } from "@/components/dashboard/job/constants/job.constants";
 import { ApplicantStatus } from "@/components/dashboard/job/types/job.types";
 import { jobService } from "@/components/dashboard/job/services/job.service";
-import { transformAPIResponseToJobDetail } from "@/components/dashboard/job/utils/job.utils";
+import {
+  transformAPIResponseToJobDetail,
+  transformAPIResponseToApplicants,
+} from "@/components/dashboard/job/utils/job.utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Empty,
@@ -83,7 +89,7 @@ export default function JobDetails() {
   const [isCreateRoundModalOpen, setIsCreateRoundModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("details");
-  const [applicants, setApplicants] = useState<Applicant[]>(mockApplicants);
+  const [applicants, setApplicants] = useState<Applicant[]>([]);
   const [rounds, setRounds] = useState<Round[]>(mockRounds);
   const [activeFilters, setActiveFilters] = useState<{
     status: string[];
@@ -96,13 +102,17 @@ export default function JobDetails() {
   });
   const [job, setJob] = useState<JobDetail | null>(null);
   const [isLoadingJob, setIsLoadingJob] = useState(true);
+  const [isLoadingApplicants, setIsLoadingApplicants] = useState(false);
+  const [applicantsPagination, setApplicantsPagination] = useState({
+    total: 0,
+    nextOffset: null as number | null,
+    previousOffset: null as number | null,
+    limit: 10,
+  });
+  const [currentApplicantsOffset, setCurrentApplicantsOffset] = useState(0);
+  const PAGE_LIMIT = 10;
 
   const { mappingValues } = useAppSelector((state) => state.jobs);
-
-  // Fetch job detail
-  useEffect(() => {
-    fetchJobDetail();
-  }, [params.id]);
 
   const fetchJobDetail = async () => {
     if (!params.id || typeof params.id !== "string") {
@@ -132,6 +142,92 @@ export default function JobDetails() {
     }
   };
 
+  const fetchApplicants = useCallback(async () => {
+    if (!params.id || typeof params.id !== "string") {
+      setIsLoadingApplicants(false);
+      return;
+    }
+
+    // Wait for job to be loaded to get jobId
+    if (!job?.jobId) {
+      setIsLoadingApplicants(false);
+      return;
+    }
+
+    setIsLoadingApplicants(true);
+    setApplicants([]);
+    setApplicantsPagination({
+      total: 0,
+      nextOffset: null,
+      previousOffset: null,
+      limit: PAGE_LIMIT,
+    });
+    try {
+      const params_query: Record<string, any> = {
+        limit: PAGE_LIMIT,
+        offset: currentApplicantsOffset,
+      };
+
+      const response = await jobService.getApplicants(params_query, {
+        filters: {
+          $and: [
+            {
+              key: "#.records.jobId",
+              operator: "$eq",
+              value: job.jobId,
+              type: "text",
+            },
+            ...(activeFilters.status.length > 0
+              ? [
+                  {
+                    key: "#.records.status",
+                    operator: "$in",
+                    value: activeFilters.status,
+                    type: "select",
+                  },
+                ]
+              : []),
+          ],
+        },
+        appId: "69521cd1c9ba83a076aac3ae",
+      });
+      const result = transformAPIResponseToApplicants(
+        response.data,
+        response.page
+      );
+      setApplicants(result.applicants);
+      setApplicantsPagination(result.pagination);
+    } catch (error: any) {
+      toast.error(
+        error?.response?.data?.message || "Failed to fetch applicants",
+        {
+          duration: 8000,
+        }
+      );
+      setApplicants([]);
+      setApplicantsPagination({
+        total: 0,
+        nextOffset: null,
+        previousOffset: null,
+        limit: PAGE_LIMIT,
+      });
+    } finally {
+      setIsLoadingApplicants(false);
+    }
+  }, [params.id, job?.jobId, currentApplicantsOffset, activeFilters]);
+
+  // Fetch job detail
+  useEffect(() => {
+    fetchJobDetail();
+  }, [params.id]);
+
+  // Fetch applicants when on applicants tab
+  useEffect(() => {
+    if (activeTab === "applicants" && params.id && job?.jobId) {
+      fetchApplicants();
+    }
+  }, [activeTab, fetchApplicants, params.id, job?.jobId]);
+
   const handleRemoveFilter = (
     type: "status" | "rounds" | "applied",
     value: string
@@ -160,6 +256,8 @@ export default function JobDetails() {
         };
       }
     });
+    // Reset to first page when filters change
+    setCurrentApplicantsOffset(0);
   };
 
   const getStatusTag = (status: ApplicantStatus) => {
@@ -184,6 +282,77 @@ export default function JobDetails() {
         );
     }
   };
+
+  // Define table columns for applicants
+  const applicantColumns: Column<Applicant>[] = useMemo(
+    () => [
+      {
+        id: "name",
+        header: "Applicant name",
+        align: "left",
+        accessor: (applicant) => applicant?.name,
+      },
+      {
+        id: "email",
+        header: "Email",
+        align: "center",
+        width: "220px",
+        accessor: (applicant) => applicant?.email,
+      },
+      {
+        id: "contact",
+        header: "Contact number",
+        align: "center",
+        accessor: (applicant) => applicant?.contact,
+      },
+      {
+        id: "status",
+        header: "Status",
+        align: "center",
+        width: "166px",
+        cell: (applicant) => (
+          <div className="flex justify-center">
+            {getStatusTag(applicant?.status)}
+          </div>
+        ),
+      },
+      {
+        id: "appliedDate",
+        header: "Applied",
+        align: "center",
+        width: "144px",
+        accessor: (applicant) => applicant?.appliedDate,
+      },
+    ],
+    []
+  );
+
+  // Row actions renderer for applicants
+  const renderApplicantRowActions = (applicant: Applicant) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+          <MoreHorizontal className="h-4 w-4" />
+          <span className="sr-only">Open menu</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem>
+          <Download className="h-4 text-[#737373] mr-2" />
+          Download
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Pencil className="h-4 text-[#737373] mr-2" />
+          Edit
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem variant="destructive">
+          <Trash2 className="h-4 mr-2" />
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
   if (isLoadingJob) {
     return (
@@ -852,84 +1021,22 @@ export default function JobDetails() {
             )}
 
             {/* Applicants Table */}
-            <div className="bg-white border border-[#e5e5e5] rounded-md overflow-hidden px-4">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-[#e5e5e5] h-10">
-                    <th className="text-left px-2 py-0 text-sm font-medium text-[#737373]">
-                      Applicant name
-                    </th>
-                    <th className="text-center px-2 py-0 text-sm font-medium text-[#737373] w-[220px]">
-                      Email
-                    </th>
-                    <th className="text-center px-2 py-0 text-sm font-medium text-[#737373]">
-                      Contact number
-                    </th>
-                    <th className="text-center px-2 py-0 text-sm font-medium text-[#737373] w-[166px]">
-                      Status
-                    </th>
-                    <th className="text-center px-2 py-0 text-sm font-medium text-[#737373] w-[144px]">
-                      Applied
-                    </th>
-                    <th className="text-center px-2 py-0 text-sm font-medium text-[#737373]">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {applicants.map((applicant, index) => (
-                    <tr
-                      key={applicant.id}
-                      className={`border-b border-[#e5e5e5] last:border-b-0 ${
-                        index === 0
-                          ? "h-[78px]"
-                          : index === 1
-                          ? "h-[77px]"
-                          : "h-[78px]"
-                      }`}
-                    >
-                      <td className="px-2 py-2 text-sm text-[#0a0a0a] text-left">
-                        {applicant.name}
-                      </td>
-                      <td className="px-2 py-2 text-sm text-[#0a0a0a] text-center">
-                        {applicant.email}
-                      </td>
-                      <td className="px-2 py-2 text-sm text-[#0a0a0a] text-center">
-                        {applicant.contact}
-                      </td>
-                      <td className="px-2 py-2 text-center">
-                        {getStatusTag(applicant.status)}
-                      </td>
-                      <td className="px-2 py-2 text-sm text-[#0a0a0a] text-center">
-                        {applicant.appliedDate}
-                      </td>
-                      <td className="px-2 py-2 text-center">
-                        <div className="flex items-center justify-center gap-4">
-                          <button
-                            className="text-[#737373] hover:text-[#0a0a0a] transition-colors"
-                            title="Download"
-                          >
-                            <Download className="w-4 h-4" />
-                          </button>
-                          <button
-                            className="text-[#3b82f6] hover:text-[#2563eb] transition-colors"
-                            title="Edit"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          <button
-                            className="text-[#b91c1c] hover:text-[#991b1b] transition-colors"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <DataTable<Applicant>
+              data={applicants}
+              columns={applicantColumns}
+              getRowId={(applicant) => applicant?.id}
+              pagination={applicantsPagination}
+              currentOffset={currentApplicantsOffset}
+              onPaginationChange={setCurrentApplicantsOffset}
+              isLoading={isLoadingApplicants}
+              loadingState={<DataTableSkeleton columns={6} rows={10} />}
+              emptyState={
+                <div className="text-center py-12">
+                  <p className="text-sm text-[#737373]">No applicants found</p>
+                </div>
+              }
+              rowActions={renderApplicantRowActions}
+            />
           </TabsContent>
         </Tabs>
       </div>
@@ -990,6 +1097,7 @@ export default function JobDetails() {
         onSubmit={(form) => {
           console.log("Applicant added:", form);
           // Handle applicant submission here
+          fetchApplicants();
         }}
       />
     </div>

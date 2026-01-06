@@ -56,4 +56,15 @@ export const jobService = {
       payload,
       signal
     ),
+  getApplicants: (
+    params: Record<string, any>,
+    payload: Record<string, any>,
+    signal?: AbortSignal
+  ) =>
+    serverInterfaceService.post(
+      API_ENDPOINTS.APPLICANT.LIST,
+      params,
+      payload,
+      signal
+    ),
 };

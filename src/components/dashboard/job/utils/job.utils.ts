@@ -6,6 +6,7 @@ import {
   APIJobDetailSection,
   JobDetail,
   ApplicantForm,
+  Applicant,
 } from "../interfaces/job.interface";
 
 export const transformAPIJobItemToJob = (item: APIJobItem): JobDetail => {
@@ -383,6 +384,80 @@ export const validate = (values: JobFormData) => {
   }
 
   return errors;
+};
+
+export const transformAPIApplicantItemToApplicant = (
+  item: APIJobItem
+): Applicant => {
+  // Create a map of values for easy lookup
+  const valuesMap = new Map<string, any>();
+  if (Array.isArray(item.values)) {
+    item.values.forEach((val) => {
+      if (val && val.key) {
+        valuesMap.set(val.key, val.value);
+      }
+    });
+  }
+
+  // Extraction with fallback
+  const name = valuesMap.get("name") || "";
+  const email = valuesMap.get("email") || "";
+  const contact = valuesMap.get("phone") || "";
+  const status = valuesMap.get("status") || "Applied";
+  const createdOnRaw = item.createdOn;
+
+  // Normalize status
+  let normalizedStatus: ApplicantStatus = "Applied";
+  if (typeof status === "string") {
+    const statusLower = status.toLowerCase();
+    if (statusLower === "interviewed") {
+      normalizedStatus = "Interviewed";
+    } else if (statusLower === "rejected") {
+      normalizedStatus = "Rejected";
+    } else {
+      normalizedStatus = "Applied";
+    }
+  }
+
+  return {
+    id: String(item?.id || ""),
+    name: String(name),
+    email: String(email),
+    contact: String(contact),
+    status: normalizedStatus,
+    appliedDate: formatRelativeTime(createdOnRaw),
+  };
+};
+
+export const transformAPIResponseToApplicants = (
+  data: APIJobItem[],
+  pagination?: APIPaginationInfo
+): { applicants: Applicant[]; pagination: APIPaginationInfo } => {
+  if (!Array.isArray(data)) {
+    return {
+      applicants: [],
+      pagination: {
+        total: 0,
+        nextOffset: null,
+        previousOffset: null,
+        limit: 10,
+      },
+    };
+  }
+
+  const applicants = data.map((item) =>
+    transformAPIApplicantItemToApplicant(item)
+  );
+
+  return {
+    applicants,
+    pagination: pagination || {
+      total: applicants.length,
+      nextOffset: null,
+      previousOffset: null,
+      limit: 10,
+    },
+  };
 };
 
 export const transformApplicantToAPIPayload = (
