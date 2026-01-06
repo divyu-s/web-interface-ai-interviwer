@@ -46,6 +46,11 @@ import { CreateRoundModal } from "@/components/dashboard/create-round-modal";
 import { DataTable, Column } from "@/components/shared/components/data-table";
 import { DataTableSkeleton } from "@/components/shared/components/data-table-skeleton";
 import {
+  FilterDropdown,
+  FilterState,
+  FilterGroup,
+} from "@/components/shared/components/filter-dropdown";
+import {
   Applicant,
   JobDetail,
   JobStat,
@@ -91,11 +96,7 @@ export default function JobDetails() {
   const [activeTab, setActiveTab] = useState("details");
   const [applicants, setApplicants] = useState<Applicant[]>([]);
   const [rounds, setRounds] = useState<Round[]>(mockRounds);
-  const [activeFilters, setActiveFilters] = useState<{
-    status: string[];
-    rounds: string[];
-    applied: string[];
-  }>({
+  const [appliedFilters, setAppliedFilters] = useState<FilterState>({
     status: [],
     rounds: [],
     applied: [],
@@ -113,6 +114,19 @@ export default function JobDetails() {
   const PAGE_LIMIT = 10;
 
   const { mappingValues } = useAppSelector((state) => state.jobs);
+
+  // Define filter groups for applicants
+  const applicantFilterGroups: FilterGroup[] = [
+    {
+      id: "status",
+      label: "Status",
+      options: [
+        { value: "Interviewed", label: "Interviewed" },
+        { value: "Applied", label: "Applied" },
+        { value: "Rejected", label: "Rejected" },
+      ],
+    },
+  ];
 
   const fetchJobDetail = async () => {
     if (!params.id || typeof params.id !== "string") {
@@ -177,12 +191,12 @@ export default function JobDetails() {
               value: job.jobId,
               type: "text",
             },
-            ...(activeFilters.status.length > 0
+            ...(appliedFilters.status.length > 0
               ? [
                   {
                     key: "#.records.status",
                     operator: "$in",
-                    value: activeFilters.status,
+                    value: appliedFilters.status,
                     type: "select",
                   },
                 ]
@@ -214,7 +228,7 @@ export default function JobDetails() {
     } finally {
       setIsLoadingApplicants(false);
     }
-  }, [params.id, job?.jobId, currentApplicantsOffset, activeFilters]);
+  }, [params.id, job?.jobId, currentApplicantsOffset, appliedFilters]);
 
   // Fetch job detail
   useEffect(() => {
@@ -228,36 +242,9 @@ export default function JobDetails() {
     }
   }, [activeTab, fetchApplicants, params.id, job?.jobId]);
 
-  const handleRemoveFilter = (
-    type: "status" | "rounds" | "applied",
-    value: string
-  ) => {
-    setActiveFilters((prev) => ({
-      ...prev,
-      [type]: prev[type].filter((v) => v !== value),
-    }));
-  };
-
-  const handleFilterChange = (
-    type: "status" | "rounds" | "applied",
-    value: string
-  ) => {
-    setActiveFilters((prev) => {
-      const current = prev[type];
-      if (current.includes(value)) {
-        return {
-          ...prev,
-          [type]: current.filter((v) => v !== value),
-        };
-      } else {
-        return {
-          ...prev,
-          [type]: [...current, value],
-        };
-      }
-    });
-    // Reset to first page when filters change
-    setCurrentApplicantsOffset(0);
+  const handleApplyFilters = (filters: FilterState) => {
+    setAppliedFilters(filters);
+    setCurrentApplicantsOffset(0); // Reset to first page when filters are applied
   };
 
   const getStatusTag = (status: ApplicantStatus) => {
@@ -832,193 +819,24 @@ export default function JobDetails() {
           <TabsContent value="applicants" className="mt-4 space-y-4">
             {/* Search and Filters */}
             <div className="flex gap-3 items-center">
-              <div className="flex-1 flex items-center gap-2 px-3 py-2.5 border-b border-[#e5e5e5]">
-                <Search className="w-[10.667px] h-[10.667px] text-[#737373]" />
+              <div className="flex-1 flex items-center gap-2 px-3 py-2.5 border-b border-[#e5e5e5] w-[245px]">
+                <Search className="w-4 h-4 text-[#737373]" />
                 <input
                   type="text"
-                  placeholder="Search Applicant"
+                  placeholder="Search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="flex-1 text-sm text-[#737373] bg-transparent border-0 outline-none placeholder:text-[#737373]"
                 />
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="secondary"
-                    className="h-9 px-4 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]"
-                  >
-                    <Filter className="w-4 h-4" />
-                    Filters
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-[207px] p-1 shadow-md"
-                >
-                  <div className="space-y-0">
-                    <DropdownMenuLabel className="px-2 py-1.5 text-sm font-semibold">
-                      Status
-                    </DropdownMenuLabel>
-                    <DropdownMenuCheckboxItem
-                      checked={activeFilters.status.includes("Interviewed")}
-                      onCheckedChange={() =>
-                        handleFilterChange("status", "Interviewed")
-                      }
-                      className="pl-8"
-                    >
-                      Interviewed
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                      checked={activeFilters.status.includes("Applied")}
-                      onCheckedChange={() =>
-                        handleFilterChange("status", "Applied")
-                      }
-                      className="pl-8"
-                    >
-                      Applied
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                      checked={activeFilters.status.includes("Rejected")}
-                      onCheckedChange={() =>
-                        handleFilterChange("status", "Rejected")
-                      }
-                      className="pl-8"
-                    >
-                      Rejected
-                    </DropdownMenuCheckboxItem>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <div className="space-y-0">
-                    <DropdownMenuLabel className="px-2 py-1.5 text-sm font-semibold">
-                      Rounds
-                    </DropdownMenuLabel>
-                    <DropdownMenuCheckboxItem
-                      checked={activeFilters.rounds.includes("Round 1")}
-                      onCheckedChange={() =>
-                        handleFilterChange("rounds", "Round 1")
-                      }
-                      className="pl-8"
-                    >
-                      Round 1
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                      checked={activeFilters.rounds.includes("Round 2")}
-                      onCheckedChange={() =>
-                        handleFilterChange("rounds", "Round 2")
-                      }
-                      className="pl-8"
-                    >
-                      Round 2
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                      checked={activeFilters.rounds.includes("Round 3")}
-                      onCheckedChange={() =>
-                        handleFilterChange("rounds", "Round 3")
-                      }
-                      className="pl-8"
-                    >
-                      Round 3
-                    </DropdownMenuCheckboxItem>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <div className="space-y-0">
-                    <DropdownMenuLabel className="px-2 py-1.5 text-sm font-semibold">
-                      Applied
-                    </DropdownMenuLabel>
-                    <DropdownMenuCheckboxItem
-                      checked={activeFilters.applied.includes("Yesterday")}
-                      onCheckedChange={() =>
-                        handleFilterChange("applied", "Yesterday")
-                      }
-                      className="pl-8"
-                    >
-                      Yesterday
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                      checked={activeFilters.applied.includes("This week")}
-                      onCheckedChange={() =>
-                        handleFilterChange("applied", "This week")
-                      }
-                      className="pl-8"
-                    >
-                      This week
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                      checked={activeFilters.applied.includes("This month")}
-                      onCheckedChange={() =>
-                        handleFilterChange("applied", "This month")
-                      }
-                      className="pl-8"
-                    >
-                      This month
-                    </DropdownMenuCheckboxItem>
-                  </div>
-                  <div className="p-1">
-                    <Button
-                      variant="ghost"
-                      className="w-full h-9 justify-start text-[#02563d] hover:text-[#02563d] hover:bg-transparent font-medium"
-                      onClick={() => {
-                        // Apply filters logic here
-                        console.log("Filters applied:", activeFilters);
-                      }}
-                    >
-                      Apply filters
-                    </Button>
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
 
-            {/* Active Filter Tags */}
-            {(activeFilters.status.length > 0 ||
-              activeFilters.rounds.length > 0 ||
-              activeFilters.applied.length > 0) && (
-              <div className="flex gap-2.5 items-start flex-wrap">
-                {activeFilters.status.map((filter) => (
-                  <Badge
-                    key={`status-${filter}`}
-                    className="bg-[#e5e5e5] text-[#000000] border-0 rounded-full px-2 h-6 text-xs font-normal hover:bg-[#e5e5e5] flex items-center gap-0.5"
-                  >
-                    {filter}
-                    <button
-                      onClick={() => handleRemoveFilter("status", filter)}
-                      className="ml-0.5 hover:bg-[rgba(0,0,0,0.1)] rounded-full p-0.5"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </Badge>
-                ))}
-                {activeFilters.rounds.map((filter) => (
-                  <Badge
-                    key={`rounds-${filter}`}
-                    className="bg-[#e5e5e5] text-[#000000] border-0 rounded-full px-2 h-6 text-xs font-normal hover:bg-[#e5e5e5] flex items-center gap-0.5"
-                  >
-                    {filter}
-                    <button
-                      onClick={() => handleRemoveFilter("rounds", filter)}
-                      className="ml-0.5 hover:bg-[rgba(0,0,0,0.1)] rounded-full p-0.5"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </Badge>
-                ))}
-                {activeFilters.applied.map((filter) => (
-                  <Badge
-                    key={`applied-${filter}`}
-                    className="bg-[#e5e5e5] text-[#000000] border-0 rounded-full px-2 h-6 text-xs font-normal hover:bg-[#e5e5e5] flex items-center gap-0.5"
-                  >
-                    {filter}
-                    <button
-                      onClick={() => handleRemoveFilter("applied", filter)}
-                      className="ml-0.5 hover:bg-[rgba(0,0,0,0.1)] rounded-full p-0.5"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </Badge>
-                ))}
-              </div>
-            )}
+              {/* Filters Button */}
+              <FilterDropdown
+                filterGroups={applicantFilterGroups}
+                onApplyFilters={handleApplyFilters}
+                initialFilters={appliedFilters}
+              />
+            </div>
 
             {/* Applicants Table */}
             <DataTable<Applicant>
