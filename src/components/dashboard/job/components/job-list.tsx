@@ -75,7 +75,7 @@ export default function JobList() {
 
   useEffect(() => {
     fetchJobs();
-  }, [currentOffset, appliedFilters, searchQuery]);
+  }, [currentOffset, appliedFilters]);
 
   const fetchJobs = async () => {
     setIsLoading(true);
@@ -91,10 +91,6 @@ export default function JobList() {
         limit: PAGE_LIMIT,
         offset: currentOffset,
       };
-
-      if (searchQuery) {
-        // params["query"] = searchQuery;
-      }
 
       const response = await jobService.getJobOpenings(params, {
         filters: {

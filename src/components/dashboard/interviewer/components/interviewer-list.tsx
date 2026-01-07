@@ -1,12 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Plus,
-  Search,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { Plus, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -73,7 +68,7 @@ export function InterviewerList() {
 
   useEffect(() => {
     fetchInterviewers();
-  }, [currentOffset, searchQuery, appliedFilters]);
+  }, [currentOffset, appliedFilters]);
 
   const fetchInterviewers = async () => {
     setIsLoading(true);
