@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useFormik } from "formik";
 import {
   Dialog,
   DialogContent,
@@ -65,60 +66,73 @@ const languageOptions = [
   { value: "hindi", label: "Hindi" },
 ];
 
+const validate = (values: InterviewerFormData) => {
+  const errors: Partial<Record<keyof InterviewerFormData, string>> = {};
+
+  if (!values.name || values.name.trim() === "") {
+    errors.name = "Interviewer name is required";
+  }
+
+  if (!values.voice || values.voice.trim() === "") {
+    errors.voice = "Voice is required";
+  }
+
+  if (!values.skills || values.skills.trim() === "") {
+    errors.skills = "Interviewer skills are required";
+  }
+
+  if (!values.roundType || values.roundType.trim() === "") {
+    errors.roundType = "Round type is required";
+  }
+
+  return errors;
+};
+
 export function CreateInterviewerModal({
   open,
   onOpenChange,
   onSubmit,
 }: CreateInterviewerModalProps) {
-  const [formData, setFormData] = React.useState<InterviewerFormData>({
-    name: "",
-    voice: "",
-    about: "",
-    skills: "",
-    roundType: "behavioural",
-    language: "",
-    personality: {
-      empathy: 100,
-      rapport: 100,
-      exploration: 100,
-      speed: 100,
+  const formik = useFormik<InterviewerFormData>({
+    initialValues: {
+      name: "",
+      voice: "",
+      about: "",
+      skills: "",
+      roundType: "behavioural",
+      language: "",
+      personality: {
+        empathy: 100,
+        rapport: 100,
+        exploration: 100,
+        speed: 100,
+      },
+    },
+    validate,
+    onSubmit: (values, { resetForm }) => {
+      onSubmit?.(values);
+      resetForm();
+      onOpenChange(false);
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit?.(formData);
-    onOpenChange(false);
-  };
-
-  const updatePersonality = (
-    trait: keyof InterviewerFormData["personality"],
-    value: number[]
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      personality: {
-        ...prev.personality,
-        [trait]: value[0],
-      },
-    }));
-  };
+  React.useEffect(() => {
+    if (!open) {
+      formik.resetForm();
+    }
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[779px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create interviewer</DialogTitle>
-          <DialogDescription>Add new AI interviewer</DialogDescription>
+          <DialogDescription></DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={formik.handleSubmit} className="space-y-4">
           {/* Basic Information Section */}
           <div className="space-y-4">
-            <h3 className="text-sm font-bold text-[#0a0a0a]">
-              Basic information
-            </h3>
-
             <div className="grid grid-cols-2 gap-4">
               {/* Interviewer Name */}
               <div className="space-y-2">
@@ -127,13 +141,16 @@ export function CreateInterviewerModal({
                 </Label>
                 <Input
                   id="name"
+                  name="name"
                   placeholder="Maya"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, name: e?.target?.value }))
-                  }
+                  value={formik.values.name}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                   className="shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)]"
                 />
+                {formik.touched.name && formik.errors.name && (
+                  <p className="text-sm text-red-500">{formik.errors.name}</p>
+                )}
               </div>
 
               {/* Voice */}
@@ -142,9 +159,9 @@ export function CreateInterviewerModal({
                   Voice <span className="text-neutral-950">*</span>
                 </Label>
                 <Select
-                  value={formData?.voice}
+                  value={formik.values.voice}
                   onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, voice: value }))
+                    formik.setFieldValue("voice", value)
                   }
                 >
                   <SelectTrigger className="w-full shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)]">
@@ -158,6 +175,9 @@ export function CreateInterviewerModal({
                     ))}
                   </SelectContent>
                 </Select>
+                {formik.touched.voice && formik.errors.voice && (
+                  <p className="text-sm text-red-500">{formik.errors.voice}</p>
+                )}
               </div>
             </div>
 
@@ -174,11 +194,11 @@ export function CreateInterviewerModal({
               </div>
               <Textarea
                 id="about"
+                name="about"
                 placeholder="Write about interviewer...."
-                value={formData.about}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, about: e?.target?.value }))
-                }
+                value={formik.values.about}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
                 className="min-h-[103px] shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)]"
               />
             </div>
@@ -190,13 +210,16 @@ export function CreateInterviewerModal({
               </Label>
               <Input
                 id="skills"
+                name="skills"
                 placeholder="Add skills"
-                value={formData.skills}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, skills: e?.target?.value }))
-                }
+                value={formik.values.skills}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
                 className="shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)]"
               />
+              {formik.touched.skills && formik.errors.skills && (
+                <p className="text-sm text-red-500">{formik.errors.skills}</p>
+              )}
             </div>
 
             {/* Round Type and Language */}
@@ -207,9 +230,9 @@ export function CreateInterviewerModal({
                   Round type <span className="text-neutral-950">*</span>
                 </Label>
                 <Select
-                  value={formData.roundType}
+                  value={formik.values.roundType}
                   onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, roundType: value }))
+                    formik.setFieldValue("roundType", value)
                   }
                   disabled
                 >
@@ -230,9 +253,9 @@ export function CreateInterviewerModal({
               <div className="space-y-2">
                 <Label htmlFor="language">Language</Label>
                 <Select
-                  value={formData.language}
+                  value={formik.values.language}
                   onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, language: value }))
+                    formik.setFieldValue("language", value)
                   }
                 >
                   <SelectTrigger className="w-full shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)]">
@@ -263,8 +286,10 @@ export function CreateInterviewerModal({
                   <Label className="text-sm font-medium">Empathy</Label>
                 </div>
                 <Slider
-                  value={[formData.personality.empathy]}
-                  onValueChange={(value) => updatePersonality("empathy", value)}
+                  value={[formik.values.personality.empathy]}
+                  onValueChange={(value) =>
+                    formik.setFieldValue("personality.empathy", value[0])
+                  }
                   max={100}
                   step={1}
                   className="flex-1"
@@ -277,8 +302,10 @@ export function CreateInterviewerModal({
                   <Label className="text-sm font-medium">Rapport</Label>
                 </div>
                 <Slider
-                  value={[formData.personality.rapport]}
-                  onValueChange={(value) => updatePersonality("rapport", value)}
+                  value={[formik.values.personality.rapport]}
+                  onValueChange={(value) =>
+                    formik.setFieldValue("personality.rapport", value[0])
+                  }
                   max={100}
                   step={1}
                   className="flex-1"
@@ -291,9 +318,9 @@ export function CreateInterviewerModal({
                   <Label className="text-sm font-medium">Exploration</Label>
                 </div>
                 <Slider
-                  value={[formData.personality.exploration]}
+                  value={[formik.values.personality.exploration]}
                   onValueChange={(value) =>
-                    updatePersonality("exploration", value)
+                    formik.setFieldValue("personality.exploration", value[0])
                   }
                   max={100}
                   step={1}
@@ -307,8 +334,10 @@ export function CreateInterviewerModal({
                   <Label className="text-sm font-medium">Speed</Label>
                 </div>
                 <Slider
-                  value={[formData.personality.speed]}
-                  onValueChange={(value) => updatePersonality("speed", value)}
+                  value={[formik.values.personality.speed]}
+                  onValueChange={(value) =>
+                    formik.setFieldValue("personality.speed", value[0])
+                  }
                   max={100}
                   step={1}
                   className="flex-1"
