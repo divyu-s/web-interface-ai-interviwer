@@ -109,9 +109,6 @@ export function FilterDropdown({
           ))}
         </div>
 
-        {/* Separator before footer */}
-        <DropdownMenuSeparator className="bg-[#e5e5e5] h-px w-full my-0 mx-0" />
-
         {/* Apply Filters Button */}
         <div className="content-stretch flex gap-0 items-center justify-end relative shrink-0 w-full">
           <Button
