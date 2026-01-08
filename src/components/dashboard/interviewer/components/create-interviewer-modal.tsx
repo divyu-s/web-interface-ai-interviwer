@@ -122,10 +122,10 @@ export function CreateInterviewerModal({
             }
           );
         }
-        onSubmit?.(values);
         resetForm();
         setSkillInput("");
         onOpenChange(false);
+        onSubmit?.();
       } catch (error: any) {
         toast.error(
           error?.response?.data?.message || "An unknown error occurred",
