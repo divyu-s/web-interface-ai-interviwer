@@ -12,8 +12,8 @@ export function InterviewerCard({ interviewer, onEdit }: InterviewerCardProps) {
       {/* Image Container with Badge */}
       <div className="relative w-full aspect-square rounded overflow-hidden mb-1">
         <Image
-          src={interviewer.imageUrl}
-          alt={interviewer.name}
+          src={interviewer?.avatar}
+          alt={interviewer?.name}
           fill
           className="object-cover"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
@@ -24,7 +24,7 @@ export function InterviewerCard({ interviewer, onEdit }: InterviewerCardProps) {
             variant="outline"
             className="bg-white border-[#e5e5e5] text-[#0a0a0a] text-xs font-semibold px-2 py-0.5 rounded-md"
           >
-            {interviewer.roundType}
+            {interviewer?.roundType}
           </Badge>
         </div>
       </div>
@@ -32,10 +32,10 @@ export function InterviewerCard({ interviewer, onEdit }: InterviewerCardProps) {
       {/* Content */}
       <div className="flex flex-col gap-1 flex-1">
         <h3 className="text-sm font-bold text-[#0a0a0a] leading-5">
-          {interviewer.name}
+          {interviewer?.name}
         </h3>
         <p className="text-xs text-[#737373] leading-5 line-clamp-2">
-          {interviewer.description}
+          {interviewer?.description}
         </p>
       </div>
 
@@ -45,7 +45,7 @@ export function InterviewerCard({ interviewer, onEdit }: InterviewerCardProps) {
           variant="secondary"
           size="default"
           className="w-full h-9 shadow-xs"
-          onClick={() => onEdit?.(interviewer.id)}
+          onClick={() => onEdit?.()}
         >
           <Pencil className="w-4 h-4" />
           Edit

@@ -10,14 +10,10 @@ import {
   FilterState,
   FilterGroup,
 } from "@/components/shared/interfaces/shared.interface";
+
 import { interviewerService } from "../services/interviewer.services";
 import {
-  transformAPIResponseToInterviewers,
-  transformAPIInterviewerItemToFormData,
-  type APIPaginationInfo,
-  type APIInterviewerItem,
-} from "../utils/interviewer.utils";
-import {
+  APIPaginationInfo,
   Interviewer,
   InterviewerFormData,
 } from "../interfaces/interviewer.interfaces";
@@ -28,6 +24,7 @@ import {
   languageOptions,
   voiceOptions,
 } from "../constants/interviewer.constants";
+import { transformAPIResponseToInterviewers } from "../utils/interviewer.utils";
 
 const PAGE_LIMIT = 12; // 4 columns x 3 rows
 
@@ -129,11 +126,16 @@ export function InterviewerList() {
       });
 
       const result = transformAPIResponseToInterviewers(
-        response.data,
-        response.page
+        response?.data || [],
+        response?.page || {
+          total: 0,
+          nextOffset: null,
+          previousOffset: null,
+          limit: PAGE_LIMIT,
+        }
       );
-      setInterviewers(result.interviewers);
-      setPagination(result.pagination);
+      setInterviewers(result?.interviewers);
+      setPagination(result?.pagination);
       // Scroll to top when page changes
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error: any) {
@@ -198,7 +200,7 @@ export function InterviewerList() {
     }
   };
 
-  const totalPages = Math.ceil(pagination.total / PAGE_LIMIT);
+  const totalPages = Math.ceil(pagination?.total || 0 / PAGE_LIMIT);
   const currentPage = Math.floor(currentOffset / PAGE_LIMIT) + 1;
 
   return (
@@ -212,7 +214,7 @@ export function InterviewerList() {
             type="text"
             placeholder="Search"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQuery(e?.target?.value)}
             className="flex-1 text-sm text-[#737373] bg-transparent border-0 outline-none placeholder:text-[#737373]"
           />
         </div>
@@ -241,7 +243,7 @@ export function InterviewerList() {
       {/* Interviewers Grid */}
       {isLoading ? (
         <div className="grid grid-cols-4 gap-6">
-          {Array.from({ length: 8 }).map((_, index) => (
+          {Array.from({ length: 8 }).map((_, index: number) => (
             <div
               key={index}
               className="bg-white border border-[#d1d1d1] rounded p-2 flex flex-col animate-pulse"
@@ -259,9 +261,9 @@ export function InterviewerList() {
           {interviewers?.length > 0 && !isLoading && (
             <>
               <div className="grid grid-cols-4 gap-6">
-                {interviewers?.map((interviewer) => (
+                {interviewers?.map((interviewer: Interviewer) => (
                   <InterviewerCard
-                    key={interviewer.id}
+                    key={interviewer?.id}
                     interviewer={interviewer}
                     onEdit={() => {
                       handleEditInterviewer(interviewer);
@@ -342,7 +344,7 @@ export function InterviewerList() {
             name: interviewerDetail?.name || "",
             voice: interviewerDetail?.voice || "",
             description: interviewerDetail?.description || "",
-            skills: interviewerDetail?.skills || [],
+            skills: interviewerDetail?.interviewerSkills || [],
             roundType: interviewerDetail?.roundType || "",
             language: interviewerDetail?.language || "",
             personality: interviewerDetail?.personality || {

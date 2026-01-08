@@ -1,32 +1,11 @@
 import {
+  APIInterviewerItem,
+  APIInterviewerValue,
+  APIPaginationInfo,
   Interviewer,
   InterviewerFormData,
+  InterviewersWithPagination,
 } from "../interfaces/interviewer.interfaces";
-
-export interface APIInterviewerValue {
-  propertyId: string;
-  key: string;
-  value: any;
-}
-
-export interface APIInterviewerItem {
-  values: APIInterviewerValue[];
-  createdOn: number;
-  updatedOn: number;
-  id: string;
-}
-
-export interface APIPaginationInfo {
-  total: number;
-  nextOffset: number | null;
-  previousOffset: number | null;
-  limit: number;
-}
-
-export interface InterviewersWithPagination {
-  interviewers: Interviewer[];
-  pagination: APIPaginationInfo;
-}
 
 // Format timestamp to relative time (e.g., "2d ago", "1h ago")
 const formatRelativeTime = (timestamp: number): string => {
@@ -54,44 +33,47 @@ export const transformAPIInterviewerItemToInterviewer = (
 ): Interviewer => {
   // Create a map of values for easy lookup
   const valuesMap = new Map<string, any>();
-  if (Array.isArray(item.values)) {
-    item.values.forEach((val) => {
-      if (val && val.key) {
-        valuesMap.set(val.key, val.value);
+  if (Array.isArray(item?.values)) {
+    item?.values?.forEach((val: APIInterviewerValue) => {
+      if (val && val?.key) {
+        valuesMap.set(val?.key, val?.value);
       }
     });
   }
 
   // Extract values with fallbacks
-  const name = valuesMap.get("name") || "Unnamed Interviewer";
-  const description = valuesMap.get("description") || "";
-  const roundType = valuesMap.get("roundType") || "Behavioral";
-  const voice = valuesMap.get("voice") || "Male";
-  const language = valuesMap.get("language") || "English";
+  const interviewerId = valuesMap?.get("interviewerId") || "";
+  const name = valuesMap?.get("name") || "Unnamed Interviewer";
+  const description = valuesMap?.get("description") || "";
+  const roundType = valuesMap?.get("roundType") || "Behavioral";
+  const voice = valuesMap?.get("voice") || "Male";
+  const language = valuesMap?.get("language") || "English";
 
   let requiredSkills: string[] = [];
-  const skillsValue = valuesMap.get("interviewerSkills");
-  if (Array.isArray(skillsValue) && skillsValue.length > 0) {
+  const skillsValue = valuesMap?.get("interviewerSkills");
+  if (Array.isArray(skillsValue) && skillsValue?.length > 0) {
     // The value is an array of arrays, each inner array might have an object with .value or "skill"
     requiredSkills = skillsValue
-      .flat()
-      .map((sk: any) => {
-        if (sk && typeof sk === "object") return sk.value || sk.skill || "";
+      ?.flat()
+      ?.map((sk: any) => {
+        if (sk && typeof sk === "object") return sk?.value || sk?.skill || "";
         return "";
       })
-      .filter((v) => !!v);
+      ?.filter((v: string) => !!v);
   }
 
   const personalityTraits = valuesMap.get("personalityTraits") || [];
   const empathy =
-    personalityTraits.find((trait: any) => trait.key === "empathy")?.value || 0;
+    personalityTraits?.find((trait: any) => trait?.key === "empathy")?.value ||
+    0;
   const rapport =
-    personalityTraits.find((trait: any) => trait.key === "rapport")?.value || 0;
+    personalityTraits?.find((trait: any) => trait?.key === "rapport")?.value ||
+    0;
   const exploration =
-    personalityTraits.find((trait: any) => trait.key === "exploration")
+    personalityTraits?.find((trait: any) => trait?.key === "exploration")
       ?.value || 0;
   const speed =
-    personalityTraits.find((trait: any) => trait.key === "speed")?.value || 0;
+    personalityTraits?.find((trait: any) => trait?.key === "speed")?.value || 0;
 
   // Determine image URL based on voice or avatar
   let imageUrl = "/interviewer-male.jpg"; // default
@@ -101,13 +83,14 @@ export const transformAPIInterviewerItemToInterviewer = (
 
   return {
     id: item?.id || "",
-    name: name,
-    voice: voice,
-    language: language,
-    description: description,
-    imageUrl,
-    roundType: roundType,
-    skills: requiredSkills,
+    interviewerId: interviewerId || "",
+    name: name || "",
+    voice: voice || "",
+    language: language || "",
+    description: description || "",
+    avatar: imageUrl || "",
+    roundType: roundType || "",
+    interviewerSkills: requiredSkills || [],
     personality: {
       empathy: empathy,
       rapport: rapport,
@@ -464,7 +447,6 @@ export const transformAPIInterviewerItemToFormData = (
   }
 
   return {
-    
     name: String(name),
     voice: String(voice),
     description: String(description),

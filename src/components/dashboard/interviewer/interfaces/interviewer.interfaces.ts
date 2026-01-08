@@ -24,11 +24,12 @@ export interface InterviewerFormData {
 
 export interface Interviewer {
   id: string;
+  interviewerId: string;
   name: string;
   description: string;
-  imageUrl: string;
+  avatar: string;
   roundType: string;
-  skills: string[];
+  interviewerSkills: string[];
   voice: string;
   language: string;
   personality: {
@@ -41,5 +42,30 @@ export interface Interviewer {
 
 export interface InterviewerCardProps {
   interviewer: Interviewer;
-  onEdit?: (id: string) => void;
+  onEdit: () => void;
+}
+
+export interface APIInterviewerValue {
+  propertyId: string;
+  key: string;
+  value: any;
+}
+
+export interface APIInterviewerItem {
+  values: APIInterviewerValue[];
+  createdOn: number;
+  updatedOn: number;
+  id: string;
+}
+
+export interface APIPaginationInfo {
+  total: number;
+  nextOffset: number | null;
+  previousOffset: number | null;
+  limit: number;
+}
+
+export interface InterviewersWithPagination {
+  interviewers: Interviewer[];
+  pagination: APIPaginationInfo;
 }
