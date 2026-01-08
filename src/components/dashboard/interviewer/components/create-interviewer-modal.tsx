@@ -77,17 +77,17 @@ export function CreateInterviewerModal({
 
   const formik = useFormik<InterviewerFormData>({
     initialValues: {
-      name: "",
-      voice: "",
-      description: "",
-      skills: [],
-      roundType: "",
-      language: "",
+      name: interviewerDetail?.name || "",
+      voice: interviewerDetail?.voice || "",
+      description: interviewerDetail?.description || "",
+      skills: interviewerDetail?.skills || [],
+      roundType: interviewerDetail?.roundType || "",
+      language: interviewerDetail?.language || "",
       personality: {
-        empathy: 0,
-        rapport: 0,
-        exploration: 0,
-        speed: 0,
+        empathy: interviewerDetail?.personality?.empathy || 0,
+        rapport: interviewerDetail?.personality?.rapport || 0,
+        exploration: interviewerDetail?.personality?.exploration || 0,
+        speed: interviewerDetail?.personality?.speed || 0,
       },
     },
     validate,
@@ -138,12 +138,6 @@ export function CreateInterviewerModal({
       }
     },
   });
-
-  useEffect(() => {
-    if (isEditMode && interviewerDetail) {
-      formik.setValues(interviewerDetail);
-    }
-  }, []);
 
   const handleAddSkill = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e?.key === "Enter" && skillInput?.trim()) {

@@ -310,36 +310,40 @@ export function InterviewerList() {
       )}
 
       {/* Create Interviewer Modal */}
-      <CreateInterviewerModal
-        open={isCreateModalOpen}
-        onOpenChange={setIsCreateModalOpen}
-        onSubmit={() => handleCreateInterviewer}
-      />
+      {isCreateModalOpen && (
+        <CreateInterviewerModal
+          open={isCreateModalOpen}
+          onOpenChange={setIsCreateModalOpen}
+          onSubmit={() => handleCreateInterviewer}
+        />
+      )}
 
       {/* Edit Interviewer Modal */}
-      <CreateInterviewerModal
-        open={isEditModalOpen}
-        onOpenChange={setIsEditModalOpen}
-        onSubmit={() => handleUpdateInterviewer}
-        isEditMode={true}
-        interviewerDetail={
-          {
-            name: interviewerDetail?.name || "",
-            voice: interviewerDetail?.voice || "",
-            description: interviewerDetail?.description || "",
-            skills: interviewerDetail?.interviewerSkills || [],
-            roundType: interviewerDetail?.roundType || "",
-            language: interviewerDetail?.language || "",
-            personality: interviewerDetail?.personality || {
-              empathy: 0,
-              rapport: 0,
-              exploration: 0,
-              speed: 0,
-            },
-          } as InterviewerFormData
-        }
-        interviewerId={interviewerDetail?.id || undefined}
-      />
+      {isEditModalOpen && (
+        <CreateInterviewerModal
+          open={isEditModalOpen}
+          onOpenChange={setIsEditModalOpen}
+          onSubmit={() => handleUpdateInterviewer}
+          isEditMode={true}
+          interviewerDetail={
+            {
+              name: interviewerDetail?.name || "",
+              voice: interviewerDetail?.voice || "",
+              description: interviewerDetail?.description || "",
+              skills: interviewerDetail?.interviewerSkills || [],
+              roundType: interviewerDetail?.roundType || "",
+              language: interviewerDetail?.language || "",
+              personality: interviewerDetail?.personality || {
+                empathy: 0,
+                rapport: 0,
+                exploration: 0,
+                speed: 0,
+              },
+            } as InterviewerFormData
+          }
+          interviewerId={interviewerDetail?.id || undefined}
+        />
+      )}
     </div>
   );
 }
