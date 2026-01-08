@@ -15,6 +15,7 @@ import {
   FilterDropdownProps,
   FilterState,
 } from "../interfaces/shared.interface";
+import { cn } from "@/lib/utils";
 
 export function FilterDropdown({
   filterGroups,
@@ -70,16 +71,19 @@ export function FilterDropdown({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className={
+        className={cn(
           contentClassName ||
-          "w-[207px] p-0 shadow-md border border-[#e5e5e5] rounded-md overflow-hidden"
-        }
+            "w-[220px] p-[4px] gap-[12px] flex flex-col items-start bg-white border border-[#e5e5e5] rounded-[8px] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)] overflow-hidden"
+        )}
       >
-        <div>
+        <div className="content-stretch flex flex-col items-start relative shrink-0 w-full gap-0">
           {filterGroups?.map((group, groupIndex) => (
-            <div key={group?.id}>
-              <div className="py-[6px]">
-                <DropdownMenuLabel className="px-[8px] py-[6px] text-xs font-semibold text-[#0A0A0A] tracking-[0.5px] leading-[16px]">
+            <div
+              key={group?.id}
+              className="content-stretch flex flex-col items-start relative shrink-0 w-full"
+            >
+              <div className="content-stretch flex flex-col items-start relative shrink-0 w-full">
+                <DropdownMenuLabel className="px-[8px] py-[6px] text-sm font-semibold text-[#0a0a0a] leading-[20px] w-full whitespace-pre-wrap">
                   {group?.label}
                 </DropdownMenuLabel>
                 {group?.options?.map((option) => (
@@ -92,30 +96,31 @@ export function FilterDropdown({
                       handleFilterChange(group?.id, option?.value)
                     }
                     onSelect={(e) => e.preventDefault()}
-                    className="pl-8 pr-2 py-[6px] text-sm text-[#1a1a1a] leading-[20px] hover:bg-[#f5f5f5] rounded-sm cursor-pointer data-highlighted:bg-[#f5f5f5] focus:bg-[#f5f5f5]"
+                    className="pl-[32px] pr-[8px] py-[6px] text-sm text-[#0a0a0a] leading-[20px] hover:bg-[#f5f5f5] rounded-sm cursor-pointer data-highlighted:bg-[#f5f5f5] focus:bg-[#f5f5f5] [&>span]:size-4"
                   >
                     {option?.label}
                   </DropdownMenuCheckboxItem>
                 ))}
               </div>
               {groupIndex < filterGroups?.length - 1 && (
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator className="bg-[#e5e5e5] h-px w-full my-0 mx-0" />
               )}
             </div>
           ))}
         </div>
 
+        {/* Separator before footer */}
+        <DropdownMenuSeparator className="bg-[#e5e5e5] h-px w-full my-0 mx-0" />
+
         {/* Apply Filters Button */}
-        <div className="border-t border-[#e5e5e5] bg-[#fafafa]">
-          <div className="p-[4px]">
-            <Button
-              variant="ghost"
-              className="w-full h-9 justify-center text-[#02563d] hover:text-[#02563d] hover:bg-[#02563d]/5 active:bg-[#02563d]/10 font-medium text-sm rounded-sm transition-colors"
-              onClick={handleApplyFilters}
-            >
-              Apply filters
-            </Button>
-          </div>
+        <div className="content-stretch flex gap-0 items-center justify-end relative shrink-0 w-full">
+          <Button
+            variant="default"
+            className="h-[36px] px-[16px] py-[8px] w-[212px] rounded-md bg-[#02563d] text-white hover:bg-[#02563d]/90 shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)]"
+            onClick={handleApplyFilters}
+          >
+            Apply filters
+          </Button>
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
