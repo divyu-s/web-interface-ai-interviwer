@@ -73,12 +73,11 @@ export const jobService = {
     ),
   updateApplicant: (
     id: string,
-    params: Record<string, any>,
     payload: Record<string, any>,
     signal?: AbortSignal
   ) =>
-    serverInterfaceService.put(
-      buildUrl(API_ENDPOINTS.APPLICANT.UPDATE, { id }),
-      { ...payload, ...params }
+    serverInterfaceService.patch(
+      buildUrl("/objects/69521d7dc9ba83a076aac3c8/records/{id}", { id }),
+      payload
     ),
 };

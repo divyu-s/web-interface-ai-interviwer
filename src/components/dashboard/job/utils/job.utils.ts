@@ -8,6 +8,7 @@ import {
   ApplicantForm,
   Applicant,
 } from "../interfaces/job.interface";
+import { ApplicantStatus } from "../types/job.types";
 
 export const transformAPIJobItemToJob = (item: APIJobItem): JobDetail => {
   // Create a map of values for easy lookup
@@ -527,13 +528,87 @@ export const transformApplicantToAPIPayload = (
     "695c9276c9ba83a076aac6ca",
   ];
 
-  // Add attachment propertyId if attachment exists
-  if (attachmentPath) {
+  return {
+    values: valuesArray,
+    propertyIds: propertyIds,
+    flows: [
+      {
+        stageId: "1",
+        status: "PENDING",
+      },
+    ],
+    status: "PENDING",
+    formId: "69521d7dc9ba83a076aac3cb",
+  };
+};
+
+export const transformApplicantToUpdatePayload = (
+  values: ApplicantForm,
+  touched?: any,
+  attachmentPath?: string,
+  status?: string
+) => {
+  const valuesArray: any[] = [];
+  const propertyIds: string[] = [];
+
+  // Helper to check if a field is touched
+  const isTouched = (field: string) => {
+    if (!touched) return true; // If no touched object provided, include all fields
+    return touched[field] === true;
+  };
+
+  // Status (if provided)
+  if (status) {
+    valuesArray.push({
+      propertyId: "695259a6c9ba83a076aac433",
+      key: "status",
+      value: status,
+    });
+    propertyIds.push("695259a6c9ba83a076aac433");
+  }
+
+  // Name
+  if (isTouched("name")) {
+    valuesArray.push({
+      propertyId: "695c91fec9ba83a076aac6c8",
+      key: "name",
+      value: values.name || "",
+    });
+    propertyIds.push("695c91fec9ba83a076aac6c8");
+  }
+
+  // Email
+  if (isTouched("email")) {
+    valuesArray.push({
+      propertyId: "695c9244c9ba83a076aac6c9",
+      key: "email",
+      value: values.email || "",
+    });
+    propertyIds.push("695c9244c9ba83a076aac6c9");
+  }
+
+  // Contact/Phone
+  if (isTouched("contact")) {
+    valuesArray.push({
+      propertyId: "695c9276c9ba83a076aac6ca",
+      key: "phone",
+      value: values.contact || "",
+    });
+    propertyIds.push("695c9276c9ba83a076aac6ca");
+  }
+
+  // Attachment
+  if (isTouched("attachment") && attachmentPath) {
+    valuesArray.push({
+      propertyId: "695c928dc9ba83a076aac6cd",
+      key: "attachment",
+      value: [`attachment//${attachmentPath}`],
+    });
     propertyIds.push("695c928dc9ba83a076aac6cd");
   }
 
   return {
     values: valuesArray,
-    propertyIds: propertyIds,
+    propertyIds,
   };
 };

@@ -188,10 +188,6 @@ export default function JobDetails() {
         offset: currentApplicantsOffset,
       };
 
-      if (searchQuery) {
-        // params_query["query"] = searchQuery;
-      }
-
       const response = await jobService.getApplicants(params_query, {
         filters: {
           $and: [

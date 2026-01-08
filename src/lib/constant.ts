@@ -17,10 +17,10 @@ export const API_ENDPOINTS = {
     FORM_PROPERTIES: "/forms/69521d4cc9ba83a076aac3bb/properties",
   },
   APPLICANT: {
-    CREATE: "/objects/69521d7dc9ba83a076aac3c8/records",
+    CREATE: "/v2/forminstances",
     LIST: "/objects/69521d7dc9ba83a076aac3c8/views/69521d7dc9ba83a076aac3c9/records",
-    DELETE: "/objects/69521d71c9ba83a076aac3c4/records/{id}",
-    UPDATE: "/objects/69521d71c9ba83a076aac3c4/records/{id}",
+    DELETE: "/objects/69521d7dc9ba83a076aac3c8/records/{id}",
+    UPDATE: "/objects/69521d7dc9ba83a076aac3c8/records/{id}",
   },
   INTERVIEWER: {
     CREATE: "/v2/forminstances",

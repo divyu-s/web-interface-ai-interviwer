@@ -26,7 +26,10 @@ import {
   ApplicantForm,
 } from "../interfaces/job.interface";
 import { jobService } from "../services/job.service";
-import { transformApplicantToAPIPayload } from "../utils/job.utils";
+import {
+  transformApplicantToAPIPayload,
+  transformApplicantToUpdatePayload,
+} from "../utils/job.utils";
 
 const validate = (values: ApplicantForm) => {
   const errors: Partial<Record<keyof ApplicantForm, string>> = {};
@@ -89,11 +92,15 @@ export function AddApplicantModal({
         );
 
         if (isEditMode && applicantId) {
-          // Update existing applicant
+          // Update existing applicant - use update payload format
+          const updatePayload = transformApplicantToUpdatePayload(
+            values,
+            formik.touched,
+            attachmentPath
+          );
           const response = await jobService.updateApplicant(
             applicantId,
-            {},
-            payload
+            updatePayload
           );
           toast.success(response?.message || "Applicant updated successfully", {
             duration: 8000,
