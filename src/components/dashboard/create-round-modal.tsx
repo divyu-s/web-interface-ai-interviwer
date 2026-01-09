@@ -98,18 +98,6 @@ const mockInterviewers = [
   { id: "6", name: "Software Engineer", image: "/interviewer-female.jpg" },
 ];
 
-const skillOptions = [
-  "JavaScript",
-  "React",
-  "Node.js",
-  "Python",
-  "TypeScript",
-  "SQL",
-  "Problem Solving",
-  "Communication",
-  "Collaboration",
-];
-
 export function CreateRoundModal({
   open,
   onOpenChange,
@@ -117,6 +105,7 @@ export function CreateRoundModal({
 }: CreateRoundModalProps) {
   const [step, setStep] = React.useState<1 | 2 | 3>(1);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [skillInput, setSkillInput] = React.useState("");
 
   const formik = useFormik<RoundFormData>({
     initialValues: {
@@ -151,6 +140,7 @@ export function CreateRoundModal({
           duration: 8000,
         });
         formik.resetForm();
+        setSkillInput("");
         setStep(1);
         onOpenChange(false);
         if (onSubmit) {
@@ -173,6 +163,7 @@ export function CreateRoundModal({
   React.useEffect(() => {
     if (!open) {
       formik.resetForm();
+      setSkillInput("");
       setStep(1);
     }
   }, [open]);
@@ -180,6 +171,7 @@ export function CreateRoundModal({
   const handleClose = () => {
     setStep(1);
     formik.resetForm();
+    setSkillInput("");
     onOpenChange(false);
   };
 
@@ -232,12 +224,25 @@ export function CreateRoundModal({
     formik.handleSubmit();
   };
 
-  const toggleSkill = (skill: string) => {
-    const currentSkills = formik.values.skills;
-    const newSkills = currentSkills.includes(skill)
-      ? currentSkills.filter((s) => s !== skill)
-      : [...currentSkills, skill];
-    formik.setFieldValue("skills", newSkills);
+  const handleAddSkill = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && skillInput?.trim()) {
+      e.preventDefault();
+      const trimmedSkill = skillInput?.trim();
+      if (!formik?.values?.skills?.includes(trimmedSkill)) {
+        formik.setFieldValue("skills", [
+          ...formik?.values?.skills,
+          trimmedSkill,
+        ]);
+      }
+      setSkillInput("");
+    }
+  };
+
+  const handleRemoveSkill = (skillToRemove: string) => {
+    formik.setFieldValue(
+      "skills",
+      formik.values.skills.filter((skill) => skill !== skillToRemove)
+    );
   };
 
   const updateCustomQuestion = (index: number, value: string) => {
@@ -492,66 +497,52 @@ export function CreateRoundModal({
 
                 {/* Skills for round */}
                 <div className="flex flex-col gap-2">
-                  <Label className="text-sm font-medium text-[#0a0a0a] leading-5">
+                  <Label
+                    htmlFor="skills"
+                    className="text-sm font-medium text-[#0a0a0a] leading-5"
+                  >
                     Skills for round <span className="text-[#b91c1c]">*</span>
                   </Label>
                   <div
-                    className={`border rounded-md h-9 px-3 py-1 flex items-center gap-1 flex-wrap shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)] min-h-[36px] ${
+                    className={`flex flex-wrap gap-1 p-3 border rounded-lg shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)] min-h-[36px] bg-white items-center ${
                       formik.touched.skills && formik.errors.skills
                         ? "border-red-500"
                         : "border-[#e5e5e5]"
                     }`}
                   >
-                    {formik.values.skills.length > 0 ? (
-                      formik.values.skills.map((skill) => (
-                        <Badge
-                          key={skill}
-                          className="bg-[#e5e5e5] text-[#0a0a0a] border-0 rounded-full px-2 h-6 text-xs font-normal hover:bg-[#e5e5e5] flex items-center gap-0.5"
+                    {formik.values.skills?.map((skill) => (
+                      <Badge
+                        key={skill}
+                        variant="secondary"
+                        className="flex items-center gap-0.5 h-[18px] bg-[#e5e5e5] text-[#000000] text-xs font-normal tracking-[0.3px] rounded-full px-2 border-0"
+                      >
+                        {skill}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveSkill(skill)}
+                          className="ml-0.5 hover:bg-[rgba(0,0,0,0.1)] rounded-full"
                         >
-                          {skill}
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleSkill(skill);
-                            }}
-                            className="ml-0.5 hover:bg-[rgba(0,0,0,0.1)] rounded-full p-0.5 flex items-center justify-center"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </Badge>
-                      ))
-                    ) : (
-                      <span className="text-sm text-[#737373]">
-                        Select skills
-                      </span>
-                    )}
+                          <X className="w-3 h-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                    <Input
+                      id="skills"
+                      placeholder={
+                        formik.values.skills.length === 0 ? "Add skills" : ""
+                      }
+                      value={skillInput}
+                      onChange={(e) => setSkillInput(e?.target?.value)}
+                      onBlur={() => formik.setFieldTouched("skills", true)}
+                      onKeyDown={handleAddSkill}
+                      className="flex-1 min-w-[120px] border-0 shadow-none focus-visible:ring-0 p-0 h-auto text-sm"
+                    />
                   </div>
                   {formik.touched.skills && formik.errors.skills && (
                     <p className="text-xs text-red-500">
                       {formik.errors.skills}
                     </p>
                   )}
-                  <div className="flex flex-wrap gap-2">
-                    {skillOptions.map((skill) => (
-                      <Badge
-                        key={skill}
-                        variant={
-                          formik.values.skills.includes(skill)
-                            ? "default"
-                            : "outline"
-                        }
-                        className={`cursor-pointer h-6 px-2 text-xs font-normal rounded-md border ${
-                          formik.values.skills.includes(skill)
-                            ? "bg-[#02563d] text-white border-transparent hover:bg-[#02563d]"
-                            : "bg-white border-[#e5e5e5] text-[#0a0a0a] hover:bg-[#f5f5f5]"
-                        }`}
-                        onClick={() => toggleSkill(skill)}
-                      >
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
                 </div>
               </div>
             </div>
