@@ -27,6 +27,7 @@ export interface CreateRoundModalProps {
   onOpenChange: (open: boolean) => void;
   onSubmit: () => void;
   mappingValues: Record<string, Record<string, any[]>>;
+  jobId: string;
 }
 
 export interface RoundFormData {

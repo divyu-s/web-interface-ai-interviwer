@@ -972,6 +972,7 @@ export default function JobDetails() {
             fetchRounds();
           }}
           mappingValues={mappingValues}
+          jobId={job?.jobId || ""}
         />
       )}
 

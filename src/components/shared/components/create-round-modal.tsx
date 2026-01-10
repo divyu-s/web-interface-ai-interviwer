@@ -30,7 +30,7 @@ import { Switch } from "@/components/ui/switch";
 
 import { roundService } from "../services/round.service";
 
-import { transformToAPIPayload } from "../utils/shared.utils";
+import { transformToCreateRoundPayload } from "../utils/shared.utils";
 import {
   CreateRoundModalProps,
   RoundFormData,
@@ -205,6 +205,7 @@ export function CreateRoundModal({
   onOpenChange,
   onSubmit,
   mappingValues,
+  jobId,
 }: CreateRoundModalProps) {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -233,7 +234,7 @@ export function CreateRoundModal({
     onSubmit: async (values: RoundFormData) => {
       setIsSubmitting(true);
       try {
-        const payload = transformToAPIPayload(values);
+        const payload = transformToCreateRoundPayload(values,jobId);
         const response = await roundService.createRound({}, payload);
         toast.success(response?.message || "Round created successfully", {
           duration: 8000,
