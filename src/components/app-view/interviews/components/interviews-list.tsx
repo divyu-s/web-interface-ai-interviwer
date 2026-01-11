@@ -222,7 +222,7 @@ export default function InterviewsList() {
         className="w-[171px] p-1 bg-white border border-[#e5e5e5] rounded-md shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)]"
       >
         <DropdownMenuItem asChild>
-          <Link href={`/dashboard/interviews/${interview.id}`}>
+          <Link href={`/app-view/interviews/${interview?.id}`}>
             <Eye className="h-4 w-4 text-[#737373]" />
             View details
           </Link>

@@ -32,6 +32,7 @@ import {
   transformApplicantToCreatePayload,
   transformApplicantToUpdatePayload,
 } from "../utils/job.utils";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 const validate = (values: ApplicantForm) => {
   const errors: Partial<Record<keyof ApplicantForm, string>> = {};
@@ -80,18 +81,8 @@ export function AddApplicantModal({
         // Handle file upload if attachment exists
         let attachmentPath: string | undefined;
         if (values?.attachment) {
-          // Use the filename for now
-          // TODO: Implement actual file upload to get the proper file path
-          // The API expects format: propertyId//filename
-          attachmentPath = values?.attachment.name;
+          attachmentPath = values?.attachment?.name;
         }
-
-        // Transform form data to API payload
-        const payload = transformApplicantToCreatePayload(
-          values,
-          jobInfo.jobId,
-          attachmentPath
-        );
 
         if (isEditMode && applicantId) {
           // Update existing applicant - use update payload format
@@ -108,6 +99,41 @@ export function AddApplicantModal({
             duration: 8000,
           });
         } else {
+          // Step 1: Get S3 upload params from API
+          if (values?.attachment) {
+            // This request returns S3 pre-signed POST data
+            const s3Data = await jobService.uploadApplicantAttachment({
+              name: `695c928dc9ba83a076aac6cd//${values?.attachment?.name}`,
+              size: values?.attachment?.size,
+            });
+
+            // s3Data should contain: url, fields
+            if (!s3Data?.url || !s3Data?.fields) {
+              toast.error("Failed to get S3 upload URL or fields.", {
+                duration: 8000,
+              });
+              return;
+            }
+
+            // Step 2: Prepare FormData as per S3 fields
+            const formData = new FormData();
+            for (const [key, value] of Object.entries(s3Data?.fields)) {
+              formData.append(key, value as string);
+            }
+            formData.append("file", values?.attachment);
+
+            // Step 3: Upload file to S3
+            const uploadResult = await jobService.uploadApplicantAttachmentToS3(
+              s3Data?.url,
+              formData
+            );
+          }
+          // Transform form data to API payload
+          const payload = transformApplicantToCreatePayload(
+            values,
+            jobInfo.jobId,
+            attachmentPath
+          );
           // Create new applicant
           const response = await jobService.createApplicant(payload);
           toast.success(response?.message || "Applicant added successfully", {
@@ -153,6 +179,7 @@ export function AddApplicantModal({
     }
 
     formik.setFieldValue("attachment", file);
+    formik.setFieldTouched("attachment", true);
   };
 
   return (
@@ -162,6 +189,7 @@ export function AddApplicantModal({
           <DialogTitle className="text-lg font-semibold text-[#0a0a0a] leading-none">
             {isEditMode ? "Edit Applicant" : "Create Applicant"}
           </DialogTitle>
+          <DialogDescription className="sr-only"></DialogDescription>
         </DialogHeader>
 
         <form onSubmit={formik.handleSubmit} className="space-y-4">
@@ -227,17 +255,17 @@ export function AddApplicantModal({
                   <Input
                     id="name"
                     name="name"
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
+                    value={formik?.values?.name}
+                    onChange={formik?.handleChange}
+                    onBlur={formik?.handleBlur}
                     placeholder="Mohan kuman"
                     className={`h-9 shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)] border-[#e5e5e5] ${
-                      formik.touched.name && formik.errors.name
+                      formik?.touched?.name && formik?.errors?.name
                         ? "border-red-500"
                         : ""
                     }`}
                   />
-                  {formik.touched.name && formik.errors.name && (
+                  {formik?.touched?.name && formik?.errors?.name && (
                     <p className="text-xs text-red-500">{formik.errors.name}</p>
                   )}
                 </div>
@@ -255,19 +283,19 @@ export function AddApplicantModal({
                       id="email"
                       name="email"
                       type="email"
-                      value={formik.values.email}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
+                      value={formik?.values?.email}
+                      onChange={formik?.handleChange}
+                      onBlur={formik?.handleBlur}
                       placeholder="mohankumar@gmail.com"
                       className={`h-9 shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)] border-[#e5e5e5] ${
-                        formik.touched.email && formik.errors.email
+                        formik?.touched?.email && formik?.errors?.email
                           ? "border-red-500"
                           : ""
                       }`}
                     />
-                    {formik.touched.email && formik.errors.email && (
+                    {formik?.touched?.email && formik?.errors?.email && (
                       <p className="text-xs text-red-500">
-                        {formik.errors.email}
+                        {formik?.errors?.email}
                       </p>
                     )}
                   </div>
@@ -281,19 +309,19 @@ export function AddApplicantModal({
                     <Input
                       id="contact"
                       name="contact"
-                      value={formik.values.contact}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
+                      value={formik?.values?.contact}
+                      onChange={formik?.handleChange}
+                      onBlur={formik?.handleBlur}
                       placeholder="+91 9876543210"
                       className={`h-9 shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)] border-[#e5e5e5] ${
-                        formik.touched.contact && formik.errors.contact
+                        formik?.touched?.contact && formik?.errors?.contact
                           ? "border-red-500"
                           : ""
                       }`}
                     />
-                    {formik.touched.contact && formik.errors.contact && (
+                    {formik?.touched?.contact && formik?.errors?.contact && (
                       <p className="text-xs text-red-500">
-                        {formik.errors.contact}
+                        {formik?.errors?.contact}
                       </p>
                     )}
                   </div>

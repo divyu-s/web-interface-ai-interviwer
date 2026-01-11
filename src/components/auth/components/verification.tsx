@@ -1,31 +1,37 @@
-"use client"
+"use client";
 
-import React from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { Formik, Form, FormikProps } from 'formik'
-import { Logo } from '@/components/logo'
-import { StatsPanel } from '@/components/stats-panel'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
-import { validateVerificationForm } from '../utils/auth.utils'
-import { VerificationFormValues } from '../types/auth.types'
+import React from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Formik, Form, FormikProps } from "formik";
+import { Logo } from "@/components/logo";
+import { StatsPanel } from "@/components/stats-panel";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import { validateVerificationForm } from "../utils/auth.utils";
+import { VerificationFormValues } from "../types/auth.types";
 
 const initialValues: VerificationFormValues = {
-  verificationCode: '',
-}
+  verificationCode: "",
+};
 
 export default function Verification() {
-  const router = useRouter()
+  const router = useRouter();
 
   const handleSubmit = (values: VerificationFormValues) => {
     // Validation passed, proceed with verification
-    console.log('Verifying code:', values.verificationCode)
+    console.log("Verifying code:", values.verificationCode);
     // In a real app, this would verify the code and log the user in
     // For now, navigate to dashboard after successful verification
-    router.push('/dashboard')
-  }
+    router.push("/app-view/dashboard");
+  };
 
   return (
     <div className="min-h-screen bg-[#fafafa]">
@@ -45,8 +51,8 @@ export default function Verification() {
                 initialValues={initialValues}
                 validate={validateVerificationForm}
                 onSubmit={(values, { setSubmitting, setTouched }) => {
-                  setTouched({ verificationCode: true })
-                  handleSubmit(values)
+                  setTouched({ verificationCode: true });
+                  handleSubmit(values);
                 }}
                 validateOnChange={true}
                 validateOnBlur={true}
@@ -63,16 +69,18 @@ export default function Verification() {
                   submitCount,
                 }: FormikProps<VerificationFormValues>) => {
                   // onChange handler for verification code
-                  const handleVerificationCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                    const newValue = e.target.value.replace(/\D/g, '') // Only allow digits
-                    setFieldValue('verificationCode', newValue)
+                  const handleVerificationCodeChange = (
+                    e: React.ChangeEvent<HTMLInputElement>
+                  ) => {
+                    const newValue = e.target.value.replace(/\D/g, ""); // Only allow digits
+                    setFieldValue("verificationCode", newValue);
                     // Only mark as touched if field was already touched or submit attempted
                     // This allows validation to run and clear errors when user fixes them
                     // but doesn't show errors while user is still typing initially
                     if (touched.verificationCode || submitCount > 0) {
-                      setFieldTouched('verificationCode', true, false)
+                      setFieldTouched("verificationCode", true, false);
                     }
-                  }
+                  };
 
                   return (
                     <Form noValidate>
@@ -80,7 +88,8 @@ export default function Verification() {
                         <CardHeader className="px-0">
                           <CardTitle>Verify Your Account</CardTitle>
                           <CardDescription>
-                            Enter the verification code sent to your email or phone number
+                            Enter the verification code sent to your email or
+                            phone number
                           </CardDescription>
                         </CardHeader>
 
@@ -95,16 +104,21 @@ export default function Verification() {
                             value={values.verificationCode}
                             onChange={handleVerificationCodeChange}
                             onBlur={(e) => {
-                              handleBlur(e)
-                              setFieldTouched('verificationCode', true)
+                              handleBlur(e);
+                              setFieldTouched("verificationCode", true);
                             }}
-                            error={(touched.verificationCode || submitCount > 0) && errors.verificationCode ? errors.verificationCode : undefined}
+                            error={
+                              (touched.verificationCode || submitCount > 0) &&
+                              errors.verificationCode
+                                ? errors.verificationCode
+                                : undefined
+                            }
                             maxLength={6}
                           />
 
-                          <Button 
+                          <Button
                             type="submit"
-                            variant="default" 
+                            variant="default"
                             className="w-full"
                           >
                             Verify
@@ -116,13 +130,19 @@ export default function Verification() {
                               <div className="w-full border-t border-slate-200" />
                             </div>
                             <div className="relative bg-white px-2">
-                              <span className="text-xs text-[#62748e] uppercase">Or continue with</span>
+                              <span className="text-xs text-[#62748e] uppercase">
+                                Or continue with
+                              </span>
                             </div>
                           </div>
 
                           {/* Social Login Buttons */}
                           <div className="grid grid-cols-2 gap-3">
-                            <Button type="button" variant="social" className="w-full">
+                            <Button
+                              type="button"
+                              variant="social"
+                              className="w-full"
+                            >
                               <svg
                                 width="18"
                                 height="18"
@@ -148,7 +168,11 @@ export default function Verification() {
                               </svg>
                               Google
                             </Button>
-                            <Button type="button" variant="social" className="w-full">
+                            <Button
+                              type="button"
+                              variant="social"
+                              className="w-full"
+                            >
                               <svg
                                 width="18"
                                 height="18"
@@ -166,7 +190,7 @@ export default function Verification() {
                         </CardContent>
                       </Card>
                     </Form>
-                  )
+                  );
                 }}
               </Formik>
 
@@ -174,7 +198,10 @@ export default function Verification() {
                 <span className="text-sm text-[#45556c]">
                   Don&apos;t have an account?
                 </span>
-                <Link href="/signup" className="text-sm text-[#02563d] font-medium hover:underline">
+                <Link
+                  href="/signup"
+                  className="text-sm text-[#02563d] font-medium hover:underline"
+                >
                   Create an account
                 </Link>
               </div>
@@ -183,6 +210,5 @@ export default function Verification() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-

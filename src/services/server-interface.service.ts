@@ -49,6 +49,22 @@ class ServerInterfaceService {
     });
     return data;
   }
+
+  async postFormData<T = any>(
+    url: string,
+    formData: FormData,
+    signal?: AbortSignal
+  ): Promise<T> {
+    // Create a new axios instance without auth headers for this request
+    const axios = (await import("axios")).default;
+    const { data } = await axios.post<T>(url, formData, {
+      signal,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return data;
+  }
 }
 
 const serverInterfaceService = new ServerInterfaceService();

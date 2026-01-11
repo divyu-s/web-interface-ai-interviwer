@@ -21,6 +21,9 @@ export const API_ENDPOINTS = {
     LIST: "/objects/69521d7dc9ba83a076aac3c8/views/69521d7dc9ba83a076aac3c9/records",
     DELETE: "/objects/69521d7dc9ba83a076aac3c8/records/{id}",
     UPDATE: "/objects/69521d7dc9ba83a076aac3c8/records/{id}",
+    UPLOAD_ATTACHMENT: "/storage-accounts/lego/upload",
+    UPLOAD_ATTACHMENT_TO_S3:
+      "https://cosmocloud-storage-accounts.s3.amazonaws.com/",
   },
   INTERVIEWER: {
     CREATE: "/v2/forminstances",

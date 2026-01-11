@@ -57,7 +57,7 @@ export default function InterviewDetail() {
       <div className="text-center py-12">
         <p className="text-[#737373]">Interview not found</p>
         <Link
-          href="/dashboard/interviews"
+          href="/app-view/interviews"
           className="text-[#02563d] hover:underline mt-4 inline-block"
         >
           Back to Interviews

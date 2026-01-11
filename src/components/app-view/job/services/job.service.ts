@@ -94,4 +94,19 @@ export const jobService = {
     serverInterfaceService.delete(
       buildUrl(API_ENDPOINTS.CREATE_ROUND.DELETE, { id })
     ),
+  uploadApplicantAttachment: (
+    payload: Record<string, any>,
+    signal?: AbortSignal
+  ) =>
+    serverInterfaceService.post(
+      API_ENDPOINTS.APPLICANT.UPLOAD_ATTACHMENT,
+      {},
+      payload,
+      signal
+    ),
+  uploadApplicantAttachmentToS3: (
+    url: string,
+    formData: FormData,
+    signal?: AbortSignal
+  ) => serverInterfaceService.postFormData(url, formData, signal),
 };
