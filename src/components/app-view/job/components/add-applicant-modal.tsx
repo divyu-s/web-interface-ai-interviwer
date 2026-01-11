@@ -331,7 +331,7 @@ export function AddApplicantModal({
                 <div className="flex gap-2.5">
                   <div className="flex-1 space-y-2">
                     <Label className="text-sm font-medium text-[#0a0a0a]">
-                      Attachment
+                      Resume
                     </Label>
                     <div className="h-9 border border-[#e5e5e5] rounded-md shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)] bg-white px-3 flex items-center justify-between">
                       <span className="text-sm text-[#0a0a0a] truncate flex-1">

@@ -138,7 +138,7 @@ export default function JobDetails() {
     if (activeTab === "applicants" && params?.id) {
       fetchApplicants();
     }
-  }, [activeTab, params?.id]);
+  }, [activeTab, params?.id, appliedFilters]);
 
   // Fetch rounds when on rounds tab
   useEffect(() => {
@@ -458,6 +458,7 @@ export default function JobDetails() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem
+          disabled={isEmpty(applicant?.attachment)}
           onClick={() => handleDownloadAttachment(applicant?.attachment)}
         >
           <Download className="h-4 text-[#737373] mr-2" />

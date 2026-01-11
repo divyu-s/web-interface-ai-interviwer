@@ -464,11 +464,6 @@ export function CreateRoundModal({
                         )}
                       </SelectContent>
                     </Select>
-                    {formik?.touched?.duration && formik?.errors?.duration && (
-                      <p className="text-xs text-red-500">
-                        {formik?.errors?.duration}
-                      </p>
-                    )}
                   </div>
                   <div className="flex-1 flex flex-col gap-2">
                     <Label className="text-sm font-medium text-[#0a0a0a] leading-5">
@@ -482,11 +477,7 @@ export function CreateRoundModal({
                       }}
                     >
                       <SelectTrigger
-                        className={`w-full h-9 shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)] ${
-                          formik?.touched?.language && formik?.errors?.language
-                            ? "border-red-500"
-                            : ""
-                        }`}
+                        className={`w-full h-9 shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)]`}
                       >
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
@@ -500,11 +491,6 @@ export function CreateRoundModal({
                         )}
                       </SelectContent>
                     </Select>
-                    {formik?.touched?.language && formik?.errors?.language && (
-                      <p className="text-xs text-red-500">
-                        {formik?.errors?.language}
-                      </p>
-                    )}
                   </div>
                 </div>
 
@@ -530,26 +516,26 @@ export function CreateRoundModal({
                     {/* Interviewer cards */}
                     {mockInterviewers.map((interviewer) => (
                       <button
-                        key={interviewer.id}
+                        key={interviewer?.id}
                         type="button"
-                        onClick={() => selectInterviewer(interviewer.id)}
+                        onClick={() => selectInterviewer(interviewer?.id)}
                         className={`border rounded p-1 flex flex-col items-center gap-1 w-[70px] h-[98px] transition-all ${
-                          formik.values.interviewer === interviewer.id
+                          formik.values.interviewer === interviewer?.id
                             ? "border-[#02563d] bg-[#f0f5f2] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)]"
                             : "border-[#d1d1d1]"
                         }`}
                       >
                         <div className="relative rounded w-[62px] h-[62px] overflow-hidden">
                           <Image
-                            src={interviewer.image}
-                            alt={interviewer.name}
+                            src={interviewer?.image}
+                            alt={interviewer?.name}
                             fill
                             className="object-cover"
                             sizes="62px"
                           />
                         </div>
                         <p className="text-xs text-[#737373] leading-none text-center w-[62px]">
-                          {interviewer.name}
+                          {interviewer?.name}
                         </p>
                       </button>
                     ))}
@@ -580,7 +566,10 @@ export function CreateRoundModal({
                         {skill}
                         <button
                           type="button"
-                          onClick={() => handleRemoveSkill(skill)}
+                          onClick={() => {
+                            formik?.setFieldTouched("skills", true);
+                            handleRemoveSkill(skill);
+                          }}
                           className="ml-0.5 hover:bg-[rgba(0,0,0,0.1)] rounded-full"
                         >
                           <X className="w-3 h-3" />
@@ -623,10 +612,12 @@ export function CreateRoundModal({
                   <RadioGroup
                     value={formik?.values?.questionType}
                     onValueChange={(value) => {
-                      formik.setFieldValue(
+                      formik?.setFieldValue(
                         "questionType",
                         value as "ai" | "hybrid" | "custom"
                       );
+
+                      formik?.setFieldTouched("questionType", true);
                       // Reset custom questions when switching away from hybrid/custom
                       if (value !== "hybrid" && value !== "custom") {
                         formik.setFieldValue("customQuestions", 0);
@@ -638,7 +629,7 @@ export function CreateRoundModal({
                     {/* AI generated questions */}
                     <label
                       className={`flex-1 flex gap-3 p-3 rounded border cursor-pointer transition-all ${
-                        formik.values.questionType === "ai"
+                        formik?.values?.questionType === "ai"
                           ? "bg-[#f0f5f2] border-[#02563d]"
                           : "border-[#e5e5e5]"
                       }`}
@@ -918,9 +909,10 @@ export function CreateRoundModal({
                         </div>
                         <Switch
                           checked={Boolean(formik?.values?.sendReminder)}
-                          onCheckedChange={(checked) =>
-                            formik.setFieldValue("sendReminder", checked)
-                          }
+                          onCheckedChange={(checked) => {
+                            formik.setFieldValue("sendReminder", checked);
+                            formik?.setFieldTouched("sendReminder", true);
+                          }}
                         />
                       </div>
                       {formik.values.sendReminder && (
@@ -929,10 +921,11 @@ export function CreateRoundModal({
                             Set reminder time
                           </Label>
                           <Select
-                            value={formik.values.reminderTime}
-                            onValueChange={(value) =>
-                              formik.setFieldValue("reminderTime", value)
-                            }
+                            value={formik?.values?.reminderTime}
+                            onValueChange={(value) => {
+                              formik?.setFieldValue("reminderTime", value);
+                              formik?.setFieldTouched("reminderTime", true);
+                            }}
                           >
                             <SelectTrigger className="w-full h-9 shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)]">
                               <SelectValue placeholder="Select" />
