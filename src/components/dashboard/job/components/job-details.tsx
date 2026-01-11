@@ -276,12 +276,6 @@ export default function JobDetails() {
       return;
     }
 
-    // Wait for job to be loaded to get jobId
-    if (!job?.jobId) {
-      setIsLoadingRounds(false);
-      return;
-    }
-
     setIsLoadingRounds(true);
     setRounds([]);
     setRoundsPagination({
@@ -300,9 +294,9 @@ export default function JobDetails() {
         filters: {
           $and: [
             {
-              key: "#.records.jobName",
+              key: "#.records.jobID",
               operator: "$eq",
-              value: "69576a84c9ba83a076aac5a0",
+              value: params?.id as string,
               type: "text",
             },
           ],
@@ -965,7 +959,7 @@ export default function JobDetails() {
             fetchRounds();
           }}
           mappingValues={mappingValues}
-          jobId={job?.jobId || ""}
+          jobId={(params?.id as string) || ""}
         />
       )}
 
@@ -992,16 +986,12 @@ export default function JobDetails() {
         jobInfo={{ jobId: params?.id as string, jobTitle: job?.title || "" }}
         isEditMode={true}
         applicantId={editingApplicant?.id}
-        applicantDetail={
-          editingApplicant
-            ? {
-                name: editingApplicant.name,
-                email: editingApplicant.email,
-                contact: editingApplicant.contact,
-                attachment: null,
-              }
-            : null
-        }
+        applicantDetail={{
+          name: editingApplicant?.name || "",
+          email: editingApplicant?.email || "",
+          contact: editingApplicant?.contact || "",
+          attachment: null,
+        }}
         onSubmit={() => {
           // Handle applicant update here
           fetchApplicants();

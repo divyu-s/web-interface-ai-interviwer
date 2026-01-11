@@ -203,7 +203,7 @@ const mockInterviewers = [
 export function CreateRoundModal({
   open,
   onOpenChange,
-  onSubmit,
+  onSubmit: onSubmitCallback,
   mappingValues,
   jobId,
 }: CreateRoundModalProps) {
@@ -243,8 +243,8 @@ export function CreateRoundModal({
         setSkillInput("");
         setStep(1);
         onOpenChange(false);
-        if (onSubmit) {
-          onSubmit();
+        if (onSubmitCallback) {
+          onSubmitCallback();
         }
       } catch (error: any) {
         toast.error(
