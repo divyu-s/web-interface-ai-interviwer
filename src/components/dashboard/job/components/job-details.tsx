@@ -934,28 +934,30 @@ export default function JobDetails() {
       </div>
 
       {/* Edit Job Modal */}
-      <CreateJobModal
-        open={isEditModalOpen}
-        onOpenChange={setIsEditModalOpen}
-        onSuccess={() => {
-          fetchJobDetail();
-        }}
-        mappingValues={mappingValues}
-        isEditMode={true}
-        jobDetail={{
-          title: job?.title || "",
-          industry: job?.industry || "",
-          jobLevel: job?.jobLevel || "",
-          jobType: job?.jobType || "",
-          minExperience: job?.minExp || null,
-          maxExperience: job?.maxExp || null,
-          description: job?.description || "",
-          noOfOpenings: job?.numOfOpenings || null,
-          attachment: null,
-          status: job?.status || "",
-          skills: job?.requiredSkills || [],
-        }}
-      />
+      {isEditModalOpen && (
+        <CreateJobModal
+          open={isEditModalOpen}
+          onOpenChange={setIsEditModalOpen}
+          onSuccess={() => {
+            fetchJobDetail();
+          }}
+          mappingValues={mappingValues}
+          isEditMode={true}
+          jobDetail={{
+            title: job?.title || "",
+            industry: job?.industry || "",
+            jobLevel: job?.jobLevel || "",
+            jobType: job?.jobType || "",
+            minExperience: job?.minExp || null,
+            maxExperience: job?.maxExp || null,
+            description: job?.description || "",
+            noOfOpenings: job?.numOfOpenings || null,
+            attachment: null,
+            status: job?.status || "",
+            skills: job?.requiredSkills || [],
+          }}
+        />
+      )}
 
       {/* Create Round Modal */}
       {isCreateRoundModalOpen && (
@@ -1002,39 +1004,43 @@ export default function JobDetails() {
       )}
 
       {/* Add Applicant Modal */}
-      <AddApplicantModal
-        open={isAddApplicantModalOpen}
-        onOpenChange={setIsAddApplicantModalOpen}
-        jobInfo={{ jobId: params?.id as string, jobTitle: job?.title || "" }}
-        onSubmit={() => {
-          // Handle applicant submission here
-          fetchApplicants();
-        }}
-      />
+      {isAddApplicantModalOpen && (
+        <AddApplicantModal
+          open={isAddApplicantModalOpen}
+          onOpenChange={setIsAddApplicantModalOpen}
+          jobInfo={{ jobId: params?.id as string, jobTitle: job?.title || "" }}
+          onSubmit={() => {
+            // Handle applicant submission here
+            fetchApplicants();
+          }}
+        />
+      )}
 
       {/* Edit Applicant Modal */}
-      <AddApplicantModal
-        open={isEditApplicantModalOpen}
-        onOpenChange={(open) => {
-          setIsEditApplicantModalOpen(open);
-          if (!open) {
-            setEditingApplicant(null);
-          }
-        }}
-        jobInfo={{ jobId: params?.id as string, jobTitle: job?.title || "" }}
-        isEditMode={true}
-        applicantId={editingApplicant?.id}
-        applicantDetail={{
-          name: editingApplicant?.name || "",
-          email: editingApplicant?.email || "",
-          contact: editingApplicant?.contact || "",
-          attachment: null,
-        }}
-        onSubmit={() => {
-          // Handle applicant update here
-          fetchApplicants();
-        }}
-      />
+      {isEditApplicantModalOpen && (
+        <AddApplicantModal
+          open={isEditApplicantModalOpen}
+          onOpenChange={(open) => {
+            setIsEditApplicantModalOpen(open);
+            if (!open) {
+              setEditingApplicant(null);
+            }
+          }}
+          jobInfo={{ jobId: params?.id as string, jobTitle: job?.title || "" }}
+          isEditMode={true}
+          applicantId={editingApplicant?.id}
+          applicantDetail={{
+            name: editingApplicant?.name || "",
+            email: editingApplicant?.email || "",
+            contact: editingApplicant?.contact || "",
+            attachment: null,
+          }}
+          onSubmit={() => {
+            // Handle applicant update here
+            fetchApplicants();
+          }}
+        />
+      )}
     </div>
   );
 }
