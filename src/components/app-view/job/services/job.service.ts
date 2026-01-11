@@ -104,6 +104,10 @@ export const jobService = {
       payload,
       signal
     ),
+  downloadApplicantAttachment: (name: string) =>
+    serverInterfaceService.get(API_ENDPOINTS.APPLICANT.DOWNLOAD_ATTACHMENT, {
+      name: name,
+    }),
   uploadApplicantAttachmentToS3: (
     url: string,
     formData: FormData,

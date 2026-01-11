@@ -24,6 +24,7 @@ export const API_ENDPOINTS = {
     UPLOAD_ATTACHMENT: "/storage-accounts/lego/upload",
     UPLOAD_ATTACHMENT_TO_S3:
       "https://cosmocloud-storage-accounts.s3.amazonaws.com/",
+    DOWNLOAD_ATTACHMENT: "/storage-accounts/lego/download",
   },
   INTERVIEWER: {
     CREATE: "/v2/forminstances",

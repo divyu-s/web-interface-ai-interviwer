@@ -457,9 +457,11 @@ export default function JobDetails() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => handleDownloadAttachment(applicant?.attachment)}
+        >
           <Download className="h-4 text-[#737373] mr-2" />
-          Download
+          Download Resume
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleEditApplicant(applicant)}>
           <Pencil className="h-4 text-[#737373] mr-2" />
@@ -520,6 +522,26 @@ export default function JobDetails() {
   const handleEditRound = (round: Round) => {
     setEditingRound(round);
     setIsEditRoundModalOpen(true);
+  };
+
+  const handleDownloadAttachment = async (attachment: string) => {
+    if (isEmpty(attachment)) return;
+    try {
+      const url = await jobService.downloadApplicantAttachment(attachment);
+      if (url) {
+        // Open the presigned S3 URL in a new tab to trigger download
+        window.open(url, "_blank");
+      } else {
+        toast.error("Failed to get download link", { duration: 8000 });
+      }
+    } catch (error: any) {
+      toast.error(
+        error?.response?.data?.message || "Failed to download attachment",
+        {
+          duration: 8000,
+        }
+      );
+    }
   };
 
   if (isLoadingJob) {
