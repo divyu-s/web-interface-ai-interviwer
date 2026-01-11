@@ -145,14 +145,12 @@ export default function JobList() {
             <Badge
               variant="outline"
               className={`capitalize font-normal text-xs tracking-[0.3px] rounded-full px-2 py-0 h-6 ${
-                statusStyles[job?.status]
+                statusStyles[
+                  job?.status?.toLowerCase() as keyof typeof statusStyles
+                ]
               }`}
             >
-              {job?.status === "active"
-                ? "Active"
-                : job?.status === "closed"
-                ? "Closed"
-                : "Draft"}
+              {job?.status}
             </Badge>
           </div>
         ),

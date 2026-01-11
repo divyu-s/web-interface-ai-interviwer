@@ -26,24 +26,26 @@ class ServerInterfaceService {
     return data;
   }
 
-  async put<T = any>(url: string, body?: Record<string, any>) {
-    const { data } = await api.put<T>(url, body);
-    return data;
-  }
-
-  async patch<T = any>(url: string, body?: Record<string, any>) {
-    const { data } = await api.patch<T>(url, body);
+  async patch<T = any>(
+    url: string,
+    body?: Record<string, any>,
+    params?: Record<string, any>,
+    signal?: AbortSignal
+  ) {
+    const { data } = await api.patch<T>(url, body, { params, signal });
     return data;
   }
 
   async delete<T = any>(
     url: string,
     body: Record<string, any> = {} as Record<string, any>,
-    params?: Record<string, any>
+    params?: Record<string, any>,
+    signal?: AbortSignal
   ): Promise<T> {
     const { data } = await api.delete<T>(url, {
       params,
       data: body,
+      signal,
     });
     return data;
   }

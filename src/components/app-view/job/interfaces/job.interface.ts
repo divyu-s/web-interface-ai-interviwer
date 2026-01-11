@@ -109,7 +109,7 @@ export interface JobDetail {
   maxExp: number;
   description: string;
   numOfOpenings: number;
-  status: "active" | "draft" | "closed";
+  status: "Active" | "Draft" | "Closed";
   accessibility: string;
   applicants: number;
   interviews: number;

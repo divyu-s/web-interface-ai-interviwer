@@ -38,19 +38,6 @@ export const interviewService = {
       params,
       signal
     ),
-  updateInterview: (
-    id: string,
-    params: Record<string, any>,
-    payload: Record<string, any>,
-    signal?: AbortSignal
-  ) =>
-    serverInterfaceService.put(
-      buildUrl(
-        API_ENDPOINTS.INTERVIEW?.UPDATE || "/objects/interviews/records/{id}",
-        { id }
-      ),
-      { ...payload, ...params }
-    ),
   deleteInterview: (id: string) =>
     serverInterfaceService.delete(
       buildUrl(

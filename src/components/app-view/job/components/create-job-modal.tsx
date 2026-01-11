@@ -126,7 +126,6 @@ export function CreateJobModal({
           const payload = transformToUpdateJobPayload(values, dirtyFields);
           const response = await jobService.updateJobOpening(
             jobId,
-            { appId: "69521cd1c9ba83a076aac3ae" },
             payload
           );
           toast.success(response?.message || "Job updated successfully", {
@@ -230,11 +229,11 @@ export function CreateJobModal({
                 id="title"
                 name="title"
                 placeholder="e.g. senior product manager"
-                value={formik.values.title}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
+                value={formik?.values?.title}
+                onChange={formik?.handleChange}
+                onBlur={formik?.handleBlur}
                 className={`h-9 shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)] border-[#e5e5e5] ${
-                  formik.touched.title && formik.errors.title
+                  formik?.touched?.title && formik?.errors?.title
                     ? "border-red-500"
                     : ""
                 }`}
@@ -248,10 +247,10 @@ export function CreateJobModal({
                   Industry
                 </Label>
                 <Select
-                  value={formik.values.industry}
+                  value={formik?.values?.industry}
                   onValueChange={(value) => {
-                    formik.setFieldValue("industry", value);
-                    formik.setFieldTouched("industry", true);
+                    formik?.setFieldValue("industry", value);
+                    formik?.setFieldTouched("industry", true);
                   }}
                 >
                   <SelectTrigger className="w-full h-9 shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)] border-[#e5e5e5]">
@@ -274,18 +273,14 @@ export function CreateJobModal({
                   Job level
                 </Label>
                 <Select
-                  value={formik.values.jobLevel}
+                  value={formik?.values?.jobLevel}
                   onValueChange={(value) => {
-                    formik.setFieldValue("jobLevel", value);
-                    formik.setFieldTouched("jobLevel", true);
+                    formik?.setFieldValue("jobLevel", value);
+                    formik?.setFieldTouched("jobLevel", true);
                   }}
                 >
                   <SelectTrigger
-                    className={`w-full h-9 shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)] border-[#e5e5e5] ${
-                      formik.touched.jobLevel && formik.errors.jobLevel
-                        ? "border-red-500"
-                        : ""
-                    }`}
+                    className={`w-full h-9 shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)] border-[#e5e5e5] `}
                   >
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
@@ -306,18 +301,14 @@ export function CreateJobModal({
                   Job type
                 </Label>
                 <Select
-                  value={formik.values.jobType}
+                  value={formik?.values?.jobType}
                   onValueChange={(value) => {
-                    formik.setFieldValue("jobType", value);
-                    formik.setFieldTouched("jobType", true);
+                    formik?.setFieldValue("jobType", value);
+                    formik?.setFieldTouched("jobType", true);
                   }}
                 >
                   <SelectTrigger
-                    className={`w-full h-9 shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)] border-[#e5e5e5] ${
-                      formik.touched.jobType && formik.errors.jobType
-                        ? "border-red-500"
-                        : ""
-                    }`}
+                    className={`w-full h-9 shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)] border-[#e5e5e5]`}
                   >
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
@@ -350,14 +341,14 @@ export function CreateJobModal({
                   }`}
                   name="minExperience"
                   placeholder="Min experience"
-                  value={formik.values.minExperience ?? ""}
+                  value={formik?.values?.minExperience ?? ""}
                   onChange={(e) => {
-                    formik.setFieldValue(
+                    formik?.setFieldValue(
                       "minExperience",
-                      e.target.value !== "" ? Number(e.target.value) : ""
+                      e?.target?.value !== "" ? Number(e?.target?.value) : ""
                     );
                   }}
-                  onBlur={formik.handleBlur}
+                  onBlur={formik?.handleBlur}
                 />
               </div>
 
@@ -375,14 +366,14 @@ export function CreateJobModal({
                   }`}
                   name="maxExperience"
                   placeholder="Max experience"
-                  value={formik.values.maxExperience ?? ""}
+                  value={formik?.values?.maxExperience ?? ""}
                   onChange={(e) => {
-                    formik.setFieldValue(
+                    formik?.setFieldValue(
                       "maxExperience",
-                      e.target.value !== "" ? Number(e.target.value) : ""
+                      e?.target?.value !== "" ? Number(e?.target?.value) : ""
                     );
                   }}
-                  onBlur={formik.handleBlur}
+                  onBlur={formik?.handleBlur}
                 />
               </div>
             </div>
@@ -407,11 +398,11 @@ export function CreateJobModal({
                 id="description"
                 name="description"
                 placeholder="Write a short description of the job"
-                value={formik.values.description}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
+                value={formik?.values?.description}
+                onChange={formik?.handleChange}
+                onBlur={formik?.handleBlur}
                 className={`min-h-[75px] shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)] border-[#e5e5e5] resize-none ${
-                  formik.touched.description && formik.errors.description
+                  formik?.touched?.description && formik?.errors?.description
                     ? "border-red-500"
                     : ""
                 }`}
@@ -429,16 +420,17 @@ export function CreateJobModal({
                   min={1}
                   name="noOfOpenings"
                   placeholder="No. of openings"
-                  value={formik.values.noOfOpenings ?? ""}
+                  value={formik?.values?.noOfOpenings ?? ""}
                   onChange={(e) => {
-                    formik.setFieldValue(
+                    formik?.setFieldValue(
                       "noOfOpenings",
-                      e.target.value !== "" ? Number(e.target.value) : ""
+                      e?.target?.value !== "" ? Number(e?.target?.value) : ""
                     );
                   }}
-                  onBlur={formik.handleBlur}
+                  onBlur={formik?.handleBlur}
                   className={`w-full h-9 shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)] border-[#e5e5e5] ${
-                    formik.touched.noOfOpenings && formik.errors.noOfOpenings
+                    formik?.touched?.noOfOpenings &&
+                    formik?.errors?.noOfOpenings
                       ? "border-red-500"
                       : ""
                   }`}
@@ -464,15 +456,15 @@ export function CreateJobModal({
                   Job status <span className="text-red-700">*</span>
                 </Label>
                 <Select
-                  value={formik.values.status}
+                  value={formik?.values?.status}
                   onValueChange={(value) => {
-                    formik.setFieldValue("status", value);
-                    formik.setFieldTouched("status", true);
+                    formik?.setFieldValue("status", value);
+                    formik?.setFieldTouched("status", true);
                   }}
                 >
                   <SelectTrigger
                     className={`w-full h-9 shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)] border-[#e5e5e5] ${
-                      formik.touched.status && formik.errors.status
+                      formik?.touched?.status && formik?.errors?.status
                         ? "border-red-500"
                         : ""
                     }`}
@@ -500,12 +492,12 @@ export function CreateJobModal({
               </Label>
               <div
                 className={`flex flex-wrap gap-1 p-3 border rounded-lg shadow-[0px_1px_2px_0px_rgba(2,86,61,0.12)] min-h-[36px] bg-white items-center ${
-                  formik.touched.skills && formik.errors.skills
+                  formik?.touched?.skills && formik?.errors?.skills
                     ? "border-red-500"
                     : "border-[#e5e5e5]"
                 }`}
               >
-                {formik.values.skills?.map((skill) => (
+                {formik?.values?.skills?.map((skill) => (
                   <Badge
                     key={skill}
                     variant="secondary"
@@ -514,7 +506,10 @@ export function CreateJobModal({
                     {skill}
                     <button
                       type="button"
-                      onClick={() => handleRemoveSkill(skill)}
+                      onClick={() => {
+                        formik?.setFieldTouched("skills", true);
+                        handleRemoveSkill(skill);
+                      }}
                       className="ml-0.5 hover:bg-[rgba(0,0,0,0.1)] rounded-full"
                     >
                       <X className="w-3 h-3" />
@@ -524,11 +519,11 @@ export function CreateJobModal({
                 <Input
                   id="skills"
                   placeholder={
-                    formik.values.skills.length === 0 ? "Add skills" : ""
+                    formik?.values?.skills?.length === 0 ? "Add skills" : ""
                   }
                   value={skillInput}
                   onChange={(e) => setSkillInput(e?.target?.value)}
-                  onBlur={() => formik.setFieldTouched("skills", true)}
+                  onBlur={() => formik?.setFieldTouched("skills", true)}
                   onKeyDown={handleAddSkill}
                   className="flex-1 min-w-[120px] border-0 shadow-none focus-visible:ring-0 p-0 h-auto text-sm"
                 />

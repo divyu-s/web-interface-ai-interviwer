@@ -31,7 +31,7 @@ export const transformAPIJobItemToJob = (item: APIJobItem): JobDetail => {
   const maxExp = valuesMap.get("maxExp") ?? 0;
   const description = valuesMap.get("description") || "";
   const numOfOpenings = valuesMap.get("numOfOpenings") ?? 0;
-  const status = valuesMap.get("status") || "draft";
+  const status = valuesMap.get("status") || "Draft";
   const accessibility = valuesMap.get("accessibility") || "";
   // Required skills extraction (expecting nested array of [{ key: 'skill', value: ... }])
   let requiredSkills: string[] = [];
@@ -47,22 +47,13 @@ export const transformAPIJobItemToJob = (item: APIJobItem): JobDetail => {
       .filter((v) => !!v);
   }
 
-  let normalizedStatus: "active" | "draft" | "closed" =
-    typeof status === "string"
-      ? status.toLowerCase() === "active"
-        ? "active"
-        : status.toLowerCase() === "closed"
-        ? "closed"
-        : "draft"
-      : "draft";
-
   // createdOn default
   const createdOnRaw = item.createdOn;
 
   return {
     id: String(item?.id || ""),
     title: String(title),
-    status: normalizedStatus,
+    status,
     industry: String(industry),
     jobLevel: String(jobLevel),
     jobType: String(jobType),
@@ -118,7 +109,7 @@ export const transformAPIResponseToJobDetail = (
     return {
       id: String(id),
       title: "",
-      status: "draft",
+      status: "Draft",
       industry: "",
       createdOn: "",
       description: "",
@@ -156,7 +147,7 @@ export const transformAPIResponseToJobDetail = (
   const maxExp = fieldsMap.get("maxExp") ?? 0;
   const description = fieldsMap.get("description") || "";
   const numOfOpenings = fieldsMap.get("numOfOpenings") ?? 0;
-  const status = fieldsMap.get("status") || "draft";
+  const status = fieldsMap.get("status") || "Draft";
   const accessibility = fieldsMap.get("accessibility") || "";
   // Required skills extraction (expecting nested array of [{ key: 'skill', value: ... }])
   let requiredSkills: string[] = [];
@@ -172,22 +163,13 @@ export const transformAPIResponseToJobDetail = (
       .filter((v) => !!v);
   }
 
-  let normalizedStatus: "active" | "draft" | "closed" =
-    typeof status === "string"
-      ? status.toLowerCase() === "active"
-        ? "active"
-        : status.toLowerCase() === "closed"
-        ? "closed"
-        : "draft"
-      : "draft";
-
   // createdOn default
   const createdOnRaw = 1767074863801;
 
   return {
     id: String(id || ""),
     title: String(title),
-    status: normalizedStatus,
+    status,
     industry: String(industry),
     jobLevel: String(jobLevel),
     jobType: String(jobType),

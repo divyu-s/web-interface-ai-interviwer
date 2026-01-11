@@ -178,7 +178,7 @@ export default function JobDetails() {
 
     setIsLoadingJob(true);
     try {
-      const response = await jobService.getJobDetail(params.id, {
+      const response = await jobService.getJobDetail(params?.id as string, {
         appId: "69521cd1c9ba83a076aac3ae",
       });
       const transformedJob = transformAPIResponseToJobDetail(
@@ -653,18 +653,14 @@ export default function JobDetails() {
             </h1>
             <Badge
               className={`border-0 rounded-full px-2 h-6 text-xs font-normal ${
-                job?.status === "active"
+                job?.status === "Active"
                   ? "bg-[#def2eb] text-[#0e4230] hover:bg-[#def2eb]"
-                  : job?.status === "closed"
+                  : job?.status === "Closed"
                   ? "bg-[#fcefec] text-[#d92d20] hover:bg-[#fcefec]"
                   : "bg-[#e5e5e5] text-[#000000] hover:bg-[#e5e5e5]"
               }`}
             >
-              {job?.status === "active"
-                ? "Active"
-                : job?.status === "closed"
-                ? "Closed"
-                : "Draft"}
+              {job?.status}
             </Badge>
           </div>
 
