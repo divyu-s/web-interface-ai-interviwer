@@ -136,6 +136,7 @@ export const transformToCreateRoundPayload = (
   ];
 
   const propertyIds = [
+    "69525a07c9ba83a076aac437",
     "69525a92c9ba83a076aac43d",
     "69525ad1c9ba83a076aac43f",
     "69525aefc9ba83a076aac440",
@@ -155,6 +156,8 @@ export const transformToCreateRoundPayload = (
     "69626f8fc9ba83a076aac8f3",
     "69627d2ec9ba83a076aac8f9",
     "69627df8c9ba83a076aac8fc",
+    "69525e6bc9ba83a076aac458",
+    "69525e47c9ba83a076aac457",
   ];
 
   if (values?.sendReminder) {
@@ -163,7 +166,6 @@ export const transformToCreateRoundPayload = (
       key: "reminderTime",
       value: values?.reminderTime,
     });
-    propertyIds.push("69525e47c9ba83a076aac457");
   }
 
   if (values?.questionType === "hybrid") {
@@ -172,7 +174,6 @@ export const transformToCreateRoundPayload = (
       key: "numOfCustomQuestions",
       value: values?.customQuestions,
     });
-    propertyIds.push("69525e6bc9ba83a076aac458");
   }
 
   return {
