@@ -24,7 +24,6 @@ export interface InterviewerFormData {
 
 export interface Interviewer {
   id: string;
-  interviewerId: string;
   name: string;
   description: string;
   avatar: string;

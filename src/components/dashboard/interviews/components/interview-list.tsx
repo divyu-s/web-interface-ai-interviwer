@@ -2,18 +2,11 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import {
-  Plus,
-  Search,
-  MoreHorizontal,
-  Eye,
-  Trash2,
-  ExternalLink,
-  Calendar,
-} from "lucide-react";
+import { Plus, Search, MoreHorizontal, Eye, Calendar } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+
 import { DataTable, Column } from "@/components/shared/components/data-table";
 import { InterviewStatsGrid } from "./interview-stats-card";
 import {

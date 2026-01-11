@@ -5,12 +5,12 @@ import { Plus, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+
 import { FilterDropdown } from "@/components/shared/components/filter-dropdown";
 import {
   FilterState,
   FilterGroup,
 } from "@/components/shared/interfaces/shared.interface";
-
 import { interviewerService } from "../services/interviewer.services";
 import {
   APIPaginationInfo,
@@ -333,22 +333,20 @@ export function InterviewerList() {
           onOpenChange={setIsEditModalOpen}
           onSubmit={handleUpdateInterviewer}
           isEditMode={true}
-          interviewerDetail={
-            {
-              name: interviewerDetail?.name || "",
-              voice: interviewerDetail?.voice || "",
-              description: interviewerDetail?.description || "",
-              skills: interviewerDetail?.interviewerSkills || [],
-              roundType: interviewerDetail?.roundType || "",
-              language: interviewerDetail?.language || "",
-              personality: interviewerDetail?.personality || {
-                empathy: 0,
-                rapport: 0,
-                exploration: 0,
-                speed: 0,
-              },
-            } as InterviewerFormData
-          }
+          interviewerDetail={{
+            name: interviewerDetail?.name || "",
+            voice: interviewerDetail?.voice || "",
+            description: interviewerDetail?.description || "",
+            skills: interviewerDetail?.interviewerSkills || [],
+            roundType: interviewerDetail?.roundType || "",
+            language: interviewerDetail?.language || "",
+            personality: interviewerDetail?.personality || {
+              empathy: 0,
+              rapport: 0,
+              exploration: 0,
+              speed: 0,
+            },
+          }}
           interviewerId={interviewerDetail?.id || undefined}
         />
       )}

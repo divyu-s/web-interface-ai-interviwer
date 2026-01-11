@@ -2,7 +2,7 @@
 
 import { useFormik } from "formik";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { X } from "lucide-react";
 
 import {
@@ -29,8 +29,8 @@ import { Badge } from "@/components/ui/badge";
 
 import { interviewerService } from "../services/interviewer.services";
 import {
-  transformToAPIPayload,
-  transformToUpdatePayload,
+  transformToInterviewerCreatePayload,
+  transformToInterviewerUpdatePayload,
 } from "../utils/interviewer.utils";
 import {
   CreateInterviewerModalProps,
@@ -97,7 +97,10 @@ export function CreateInterviewerModal({
       try {
         if (isEditMode && interviewerId) {
           // Edit mode - update existing interviewer
-          const payload = transformToUpdatePayload(values, formik.touched);
+          const payload = transformToInterviewerUpdatePayload(
+            values,
+            formik.touched
+          );
           const response = await interviewerService.updateInterviewer(
             interviewerId,
             payload
@@ -110,7 +113,7 @@ export function CreateInterviewerModal({
           );
         } else {
           // Create mode - create new interviewer
-          const payload = transformToAPIPayload(values);
+          const payload = transformToInterviewerCreatePayload(values);
           const response = await interviewerService.createInterviewer(
             {},
             payload
