@@ -241,10 +241,17 @@ export function CreateRoundModal({
       setIsSubmitting(true);
       try {
         if (isEditMode && roundId) {
-          // Update existing round - use update payload format
+          // Calculate dirty fields by comparing current values with initial values
+          // Use Formik's touched fields to determine which fields have been edited
+          const dirtyFields: Partial<Record<keyof RoundFormData, boolean>> = {};
+          Object.keys(formik?.touched).forEach((key) => {
+            const fieldKey = key as keyof RoundFormData;
+            dirtyFields[fieldKey] = true;
+          });
+
           const updatePayload = transformToUpdateRoundPayload(
             values,
-            formik.touched
+            dirtyFields
           );
           const response = await roundService.updateRound(
             roundId,
