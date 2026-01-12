@@ -9,39 +9,33 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 import { InterviewDetail as InterviewDetailType } from "../interfaces/interview.interface";
 import { InterviewDetailData } from "../interfaces/interview-detail.interface";
-import { mockInterviews } from "../constants/interview.constants";
 import { mockInterviewDetailData } from "../constants/interview-detail.constants";
-import {
-  statusStyles,
-  getStatusText,
-  formatInterviewDate,
-} from "../utils/interview.utils";
+import { formatInterviewDate } from "../utils/interview.utils";
 
 export default function InterviewDetail() {
   const params = useParams();
-  const interviewId = params?.id as string;
-  const [interview, setInterview] = useState<InterviewDetailType | null>(null);
+  const [interview, setInterview] = useState<>({
+    id: "1",
+    candidateName: "John Doe",
+    candidateEmail: "john.doe@example.com",
+    jobTitle: "Software Engineer",
+    interviewerName: "Jane Doe",
+    status: "Completed",
+    interviewDate: "2024-01-20",
+    roundName: "Round 1",
+    score: 85,
+    duration: 45,
+  });
   const [detailData, setDetailData] = useState<InterviewDetailData | null>(
     null
   );
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      const foundInterview = mockInterviews.find(
-        (int) => int.id === interviewId
-      );
-      if (foundInterview) {
-        setInterview(foundInterview);
-        // Get detail data (use interview id or default to "1")
-        const data =
-          mockInterviewDetailData[interviewId] || mockInterviewDetailData["1"];
-        setDetailData(data);
-      }
-      setIsLoading(false);
-    }, 300);
-  }, [interviewId]);
+    // Get detail data (use interview id or default to "1")
+    const data = mockInterviewDetailData["1"];
+    setDetailData(data);
+  }, []);
 
   if (isLoading) {
     return (
@@ -79,7 +73,7 @@ export default function InterviewDetail() {
               variant="outline"
               className={`bg-[#def2eb] font-normal text-xs tracking-[0.3px] rounded-full px-2 py-0 h-6 border-transparent text-[#0e4230]`}
             >
-              {getStatusText(interview.status)}
+              {interview.status}
             </Badge>
           </div>
           <p className="text-xs text-[#737373] leading-none">
@@ -90,7 +84,7 @@ export default function InterviewDetail() {
           <div className="flex items-center gap-1 text-xs text-[#404040]">
             <Calendar className="w-4 h-4" />
             <span>
-              Interview date: {formatInterviewDate(interview.scheduledDate)}
+              Interview date: {formatInterviewDate(interview.interviewDate)}
             </span>
           </div>
           <div className="flex items-center gap-1 text-xs text-[#404040]">

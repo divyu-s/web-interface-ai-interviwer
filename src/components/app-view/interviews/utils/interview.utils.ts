@@ -1,24 +1,8 @@
 import {
-  InterviewDetail,
   APIInterviewItem,
   APIPaginationInfo,
   InterviewsWithPagination,
 } from "../interfaces/interview.interface";
-
-/**
- * Normalize status from API format to InterviewStatus format
- */
-function normalizeStatus(status: string): InterviewDetail["status"] {
-  const statusMap: Record<string, InterviewDetail["status"]> = {
-    Scheduled: "scheduled",
-    "In Progress": "in-progress",
-    Completed: "completed",
-    Canceled: "cancelled",
-    Cancelled: "cancelled",
-    Pending: "pending",
-  };
-  return statusMap[status] || "pending";
-}
 
 /**
  * Transform API response to InterviewDetail format
@@ -27,7 +11,7 @@ export function transformAPIResponseToInterviews(
   data: APIInterviewItem[],
   pageInfo: APIPaginationInfo
 ): InterviewsWithPagination {
-  const interviews: InterviewDetail[] = data.map((item) => {
+  const interviews = data.map((item) => {
     const valuesMap: Record<string, any> = {};
     item.values.forEach((val) => {
       valuesMap[val.key] = val.value;
@@ -43,34 +27,22 @@ export function transformAPIResponseToInterviews(
     }
 
     // Normalize status
-    const statusValue = valuesMap.status || "Pending";
-    const normalizedStatus = normalizeStatus(statusValue);
+    const statusValue = valuesMap.status;
 
     return {
       id: item.id,
-      interviewId: item.id,
       candidateName: candidateName,
       candidateEmail:
         valuesMap.applicantEmail || valuesMap.candidateEmail || "N/A",
       jobTitle: valuesMap.jobTitle || "N/A",
-      jobId: valuesMap.jobId || "",
       interviewerName: valuesMap.interviewerName || "N/A",
-      interviewerId: valuesMap.interviewerId || "",
-      status: normalizedStatus,
-      scheduledDate: valuesMap.scheduledDate || valuesMap.date || "",
-      scheduledTime: valuesMap.scheduledTime || valuesMap.time || "",
-      duration: valuesMap.duration || 30,
+      status: statusValue,
+      interviewDate: "",
       roundName: valuesMap.roundName || "N/A",
-      roundId: valuesMap.roundId || "",
       score:
         valuesMap.score !== undefined && valuesMap.score !== null
           ? valuesMap.score
           : undefined,
-      completedAt: valuesMap.completedAt,
-      createdAt: formatDate(item.createdOn),
-      updatedAt: formatDate(item.updatedOn),
-      interviewLink: valuesMap.interviewLink,
-      token: valuesMap.token,
     };
   });
 
@@ -78,58 +50,6 @@ export function transformAPIResponseToInterviews(
     interviews,
     pagination: pageInfo,
   };
-}
-
-/**
- * Format timestamp to readable date string
- */
-function formatDate(timestamp: number): string {
-  if (!timestamp) return "N/A";
-  const date = new Date(timestamp);
-  const now = new Date();
-  const diffTime = Math.abs(now.getTime() - date.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) return "Today";
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays}d ago`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
-  if (diffDays < 365) return `${Math.floor(diffDays / 30)}mo ago`;
-  return `${Math.floor(diffDays / 365)}y ago`;
-}
-
-/**
- * Format date and time for display
- */
-export function formatDateTime(date: string, time: string): string {
-  if (!date || !time) return "N/A";
-  try {
-    const dateObj = new Date(`${date}T${time}`);
-    return dateObj.toLocaleString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
-  } catch {
-    return `${date} ${time}`;
-  }
-}
-
-/**
- * Get status badge text
- */
-export function getStatusText(status: string): string {
-  const statusMap: Record<string, string> = {
-    scheduled: "Scheduled",
-    "in-progress": "In Progress",
-    completed: "Completed",
-    cancelled: "Cancelled",
-    pending: "Pending",
-  };
-  return statusMap[status] || status;
 }
 
 /**

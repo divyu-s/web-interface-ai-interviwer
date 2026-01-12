@@ -107,7 +107,7 @@ export default function InterviewsList() {
         }
       );
 
-      setInterviews(result.interviews);
+      setInterviews(result?.interviews || []);
       setPagination(result?.pagination);
 
       // Scroll to top when page changes
@@ -218,7 +218,7 @@ export default function InterviewsList() {
         align: "center",
         cell: (interview) => (
           <span className="text-sm font-normal text-[#0a0a0a] text-center">
-            {formatInterviewDate(interview?.scheduledDate)}
+            {formatInterviewDate(interview?.interviewDate)}
           </span>
         ),
       },
