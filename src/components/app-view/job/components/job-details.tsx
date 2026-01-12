@@ -995,6 +995,7 @@ export default function JobDetails() {
             fetchRounds();
           }}
           mappingValues={mappingValues}
+          isEditMode={true}
           jobId={(params?.id as string) || ""}
           roundDetail={{
             roundName: editingRound?.name || "",

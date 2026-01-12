@@ -591,31 +591,19 @@ export const transformApplicantToCreatePayload = (
 
 export const transformApplicantToUpdatePayload = (
   values: ApplicantForm,
-  touched?: any,
-  attachmentPath?: string,
-  status?: string
+  dirtyFields: Partial<Record<keyof ApplicantForm, boolean | any>>,
+  attachmentPath?: string
 ) => {
   const valuesArray: any[] = [];
   const propertyIds: string[] = [];
 
   // Helper to check if a field is touched
-  const isTouched = (field: string) => {
-    if (!touched) return true; // If no touched object provided, include all fields
-    return touched[field] === true;
+  const isDirty = (field: keyof ApplicantForm) => {
+    return dirtyFields[field] === true;
   };
 
-  // Status (if provided)
-  if (status) {
-    valuesArray.push({
-      propertyId: "695259a6c9ba83a076aac433",
-      key: "status",
-      value: status,
-    });
-    propertyIds.push("695259a6c9ba83a076aac433");
-  }
-
   // Name
-  if (isTouched("name")) {
+  if (isDirty("name")) {
     valuesArray.push({
       propertyId: "695c91fec9ba83a076aac6c8",
       key: "name",
@@ -625,7 +613,7 @@ export const transformApplicantToUpdatePayload = (
   }
 
   // Email
-  if (isTouched("email")) {
+  if (isDirty("email")) {
     valuesArray.push({
       propertyId: "695c9244c9ba83a076aac6c9",
       key: "email",
@@ -635,7 +623,7 @@ export const transformApplicantToUpdatePayload = (
   }
 
   // Contact/Phone
-  if (isTouched("contact")) {
+  if (isDirty("contact")) {
     valuesArray.push({
       propertyId: "695c9276c9ba83a076aac6ca",
       key: "phone",
@@ -645,7 +633,7 @@ export const transformApplicantToUpdatePayload = (
   }
 
   // Attachment
-  if (isTouched("attachment") && attachmentPath) {
+  if (isDirty("attachment") && attachmentPath) {
     valuesArray.push({
       propertyId: "695c928dc9ba83a076aac6cd",
       key: "attachment",

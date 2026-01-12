@@ -78,17 +78,58 @@ export function AddApplicantModal({
     onSubmit: async (values) => {
       setIsSubmitting(true);
       try {
-        // Handle file upload if attachment exists
-        let attachmentPath: string | undefined;
-        if (values?.attachment) {
-          attachmentPath = values?.attachment?.name;
-        }
+        if (isEditMode) {
+          if (!applicantId) {
+            toast.error("Applicant ID is required for update", {
+              duration: 8000,
+            });
+            setIsSubmitting(false);
+            return;
+          }
+          // Handle file upload if attachment exists and is new
+          let attachmentPath: string | undefined;
+          if (values?.attachment && formik?.touched?.attachment) {
+            // Step 1: Get S3 upload params from API
+            const s3Data = await jobService.uploadApplicantAttachment({
+              name: `695c928dc9ba83a076aac6cd//${values?.attachment?.name}`,
+              size: values?.attachment?.size,
+            });
 
-        if (isEditMode && applicantId) {
+            // s3Data should contain: url, fields
+            if (!s3Data?.url || !s3Data?.fields) {
+              toast.error("Failed to get S3 upload URL or fields.", {
+                duration: 8000,
+              });
+              setIsSubmitting(false);
+              return;
+            }
+
+            // Step 2: Prepare FormData as per S3 fields
+            const formData = new FormData();
+            for (const [key, value] of Object.entries(s3Data?.fields)) {
+              formData.append(key, value as string);
+            }
+            formData.append("file", values?.attachment);
+
+            // Step 3: Upload file to S3
+            await jobService.uploadApplicantAttachmentToS3(
+              s3Data?.url,
+              formData
+            );
+            attachmentPath = values?.attachment?.name;
+          }
+          // Calculate dirty fields by comparing current values with initial values
+          // Use Formik's touched fields to determine which fields have been edited
+          const dirtyFields: Partial<Record<keyof ApplicantForm, boolean>> = {};
+          Object.keys(formik.touched).forEach((key) => {
+            const fieldKey = key as keyof ApplicantForm;
+            dirtyFields[fieldKey] = true;
+          });
+
           // Update existing applicant - use update payload format
           const updatePayload = transformApplicantToUpdatePayload(
             values,
-            formik.touched,
+            dirtyFields,
             attachmentPath
           );
           const response = await jobService.updateApplicant(
@@ -99,6 +140,11 @@ export function AddApplicantModal({
             duration: 8000,
           });
         } else {
+          // Handle file upload if attachment exists
+          let attachmentPath: string | undefined;
+          if (values?.attachment) {
+            attachmentPath = values?.attachment?.name;
+          }
           // Step 1: Get S3 upload params from API
           if (values?.attachment) {
             // This request returns S3 pre-signed POST data
@@ -397,7 +443,9 @@ export function AddApplicantModal({
               type="submit"
               variant="default"
               className="h-9 px-4 bg-[#02563d] hover:bg-[#02563d]/90 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]"
-              disabled={isSubmitting || !formik.isValid}
+              disabled={
+                isSubmitting || !formik.isValid || (!formik.dirty && isEditMode)
+              }
             >
               {isSubmitting
                 ? isEditMode
