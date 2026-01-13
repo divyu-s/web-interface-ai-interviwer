@@ -1,20 +1,27 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
-import { Input } from "./input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select"
+import * as React from "react";
+import { cn } from "@/lib/utils";
+import { Input } from "./input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./select";
 
 interface PhoneInputProps {
-  label?: string
-  required?: boolean
-  error?: string
-  countryCode: string
-  phoneNumber: string
-  onCountryCodeChange: (value: string) => void
-  onPhoneNumberChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void
-  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void
-  id?: string
-  className?: string
+  label?: string;
+  required?: boolean;
+  error?: string;
+  countryCode: string;
+  phoneNumber: string;
+  onCountryCodeChange: (value: string) => void;
+  onPhoneNumberChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
+  id?: string;
+  className?: string;
+  placeholder?: string;
 }
 
 // Common country codes
@@ -39,7 +46,7 @@ const countryCodes = [
   { value: "+971", label: "+971", country: "AE" },
   { value: "+27", label: "+27", country: "ZA" },
   { value: "+52", label: "+52", country: "MX" },
-]
+];
 
 export function PhoneInput({
   label,
@@ -53,24 +60,19 @@ export function PhoneInput({
   onBlur,
   id,
   className,
+  placeholder = "9876543210",
 }: PhoneInputProps) {
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
       {label && (
-        <label
-          htmlFor={id}
-          className="text-sm font-medium text-[#0a0a0a]"
-        >
+        <label htmlFor={id} className="text-sm font-medium text-[#0a0a0a]">
           {label}
           {required && <span className="text-destructive ml-1">*</span>}
         </label>
       )}
       <div className="flex gap-2">
-        <Select
-          value={countryCode}
-          onValueChange={onCountryCodeChange}
-        >
-          <SelectTrigger 
+        <Select value={countryCode} onValueChange={onCountryCodeChange}>
+          <SelectTrigger
             className={cn(
               "w-fit min-w-[80px] h-9 border-[#C4C4C4] rounded-md",
               error && "border-destructive"
@@ -93,7 +95,7 @@ export function PhoneInput({
           onChange={onPhoneNumberChange}
           onFocus={onFocus}
           onBlur={onBlur}
-          placeholder="9876543210"
+          placeholder={placeholder}
           data-slot="input"
           aria-invalid={error ? "true" : undefined}
           className={cn(
@@ -101,14 +103,12 @@ export function PhoneInput({
             "focus-visible:outline-none focus-visible:border focus-visible:border-[#A3A3A3] focus-visible:shadow-[0_0_0_3px_rgba(2,86,61,0.50)]",
             "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
             error && "border-destructive",
-            error && "focus-visible:border-destructive focus-visible:shadow-[0_0_0_3px_rgba(220,38,38,0.20)] focus-visible:bg-white"
+            error &&
+              "focus-visible:border-destructive focus-visible:shadow-[0_0_0_3px_rgba(220,38,38,0.20)] focus-visible:bg-white"
           )}
         />
       </div>
-      {error && (
-        <p className="text-sm text-destructive">{error}</p>
-      )}
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
-  )
+  );
 }
-

@@ -49,27 +49,17 @@ export const validatePhoneNumber = (
  * Applicant authentication form validation
  */
 export const validateApplicantAuthForm = (values: {
-  firstName: string;
-  lastName: string;
+  fullName: string;
   email: string;
   phone: string;
 }): ValidationError => {
   const errors: ValidationError = {};
 
-  // First name validation
-  if (!values.firstName || values.firstName.trim().length === 0) {
-    errors.firstName = "First name is required";
-  } else if (values.firstName.trim().length < 2) {
-    errors.firstName = "First name must be at least 2 characters";
-  }
-
-  // Last name validation (optional)
-  if (
-    values.lastName &&
-    values.lastName.trim().length > 0 &&
-    values.lastName.trim().length < 2
-  ) {
-    errors.lastName = "Last name must be at least 2 characters";
+  // Full name validation
+  if (!values.fullName || values.fullName.trim().length === 0) {
+    errors.fullName = "Full name is required";
+  } else if (values.fullName.trim().length < 2) {
+    errors.fullName = "Full name must be at least 2 characters";
   }
 
   // Email validation

@@ -7,16 +7,14 @@ export interface ValidationError {
 }
 
 export interface ApplicantAuthFormValues {
-  firstName: string;
-  lastName: string;
+  fullName: string;
   email: string;
   countryCode: string;
   phone: string;
 }
 
 export interface ApplicantAuthRequest {
-  firstName: string;
-  lastName: string;
+  fullName: string;
   email: string;
   phone: string;
   countryCode: string;
