@@ -41,5 +41,6 @@ export const API_ENDPOINTS = {
     DETAIL: "/api/objects/interviews/records/{id}",
     DELETE: "/api/objects/interviews/records/{id}",
     CANCEL: "/api/objects/interviews/records/{id}/cancel",
+    VERIFY_APPLICANT: "/api/interviews/{id}/verify-applicant",
   },
 };
