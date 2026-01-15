@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Clock, ChevronRight, Check, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,16 @@ export function InterviewActiveFlow({
   const [showTipsModal, setShowTipsModal] = useState(true);
   const isLastQuestion = currentQuestion === totalQuestions;
 
+  // Ensure video plays when component mounts and stream is available
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video && video.srcObject) {
+      video.play().catch((error) => {
+        console.error("Error playing video:", error);
+      });
+    }
+  }, [videoRef]);
+
   const handleStartInterview = () => {
     setShowTipsModal(false);
     onInterviewStart();
@@ -79,6 +89,11 @@ export function InterviewActiveFlow({
                 playsInline
                 muted
                 className="w-full h-full object-cover"
+                onLoadedMetadata={(e) => {
+                  e.currentTarget.play().catch((error) => {
+                    console.error("Error playing video on load:", error);
+                  });
+                }}
               />
               {/* Timer overlay on video - positioned at bottom center */}
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2">

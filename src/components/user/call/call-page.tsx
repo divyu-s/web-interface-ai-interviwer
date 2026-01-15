@@ -57,12 +57,13 @@ export default function CallPage({ interviewId }: CallPageProps) {
     };
   }, [isInterviewActive, flowState]);
 
-  // Ensure video stream is attached when verification flow is active
+  // Ensure video stream is attached when verification flow or interview is active
   useEffect(() => {
     if (
       (flowState === "verification-ready" ||
         flowState === "verification-recording" ||
-        flowState === "verification-completed") &&
+        flowState === "verification-completed" ||
+        flowState === "interview-active") &&
       streamRef.current &&
       videoRef.current
     ) {
@@ -152,7 +153,7 @@ export default function CallPage({ interviewId }: CallPageProps) {
   };
 
   const handleVerificationContinue = () => {
-    stopCamera();
+    // Don't stop camera - it should continue during the interview
     setFlowState("interview-active");
   };
 
