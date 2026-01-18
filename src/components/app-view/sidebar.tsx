@@ -40,7 +40,15 @@ export function Sidebar() {
       <nav className="flex-1 px-4 pt-4">
         <div className="flex flex-col gap-1">
           {navigation?.map((item: any) => {
-            const isActive = pathname === item?.href;
+            const routesWithSubPaths = [
+              "/app-view/dashboard",
+              "/app-view/jobs",
+              "/app-view/interviewers",
+              "/app-view/interviews",
+            ];
+            const isActive = routesWithSubPaths.includes(item?.href)
+              ? pathname === item?.href || pathname.startsWith(`${item?.href}/`)
+              : pathname === item?.href;
             const Icon = item?.icon;
 
             return (

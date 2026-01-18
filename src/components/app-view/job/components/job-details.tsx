@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { useParams } from "next/navigation";
+import { useState, useEffect, useMemo } from "react";
+import { useParams, useRouter } from "next/navigation";
 import {
   Building2,
   Clock,
@@ -15,6 +15,7 @@ import {
   MoreVertical,
   MoreHorizontal,
   Briefcase,
+  ChevronLeft,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -75,6 +76,7 @@ export const stats: JobStat[] = [
 
 export default function JobDetails() {
   const params = useParams();
+  const router = useRouter();
   const [whatsappReminder, setWhatsappReminder] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -671,6 +673,10 @@ export default function JobDetails() {
         <div className="space-y-2.5">
           {/* Title + Badge */}
           <div className="flex items-center gap-2.5">
+            <ChevronLeft
+              className="cursor-pointer"
+              onClick={() => router.back()}
+            />
             <h1 className="text-xl font-bold text-black leading-7">
               {job?.title}
             </h1>
