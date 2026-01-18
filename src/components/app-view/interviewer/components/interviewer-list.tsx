@@ -19,12 +19,9 @@ import {
 } from "../interfaces/interviewer.interfaces";
 import { CreateInterviewerModal } from "./create-interviewer-modal";
 import { InterviewerCard } from "./interviewer-card";
-import {
-  roundTypeOptions,
-  languageOptions,
-  voiceOptions,
-} from "../constants/interviewer.constants";
+
 import { transformAPIResponseToInterviewers } from "../utils/interviewer.utils";
+import { useAppSelector } from "@/store/hooks";
 
 const PAGE_LIMIT = 12; // 4 columns x 3 rows
 
@@ -50,23 +47,36 @@ export function InterviewerList() {
   const [interviewerDetail, setInterviewerDetail] =
     useState<Interviewer | null>(null);
   const observerTarget = useRef<HTMLDivElement>(null);
+  const { mappingValues } = useAppSelector((state) => state.interviewers);
 
   // Define filter groups for interviewers
   const interviewerFilterGroups: FilterGroup[] = [
     {
       id: "roundType",
       label: "Round Type",
-      options: roundTypeOptions,
+      options:
+        mappingValues?.interviewers?.roundType?.map((status: string) => ({
+          value: status,
+          label: status,
+        })) || [],
     },
     {
       id: "language",
       label: "Language",
-      options: languageOptions,
+      options:
+        mappingValues?.interviewers?.language?.map((status: string) => ({
+          value: status,
+          label: status,
+        })) || [],
     },
     {
       id: "voice",
       label: "Voice",
-      options: voiceOptions,
+      options:
+        mappingValues?.interviewers?.voice?.map((status: string) => ({
+          value: status,
+          label: status,
+        })) || [],
     },
   ];
 
@@ -358,6 +368,7 @@ export function InterviewerList() {
           open={isCreateModalOpen}
           onOpenChange={setIsCreateModalOpen}
           onSubmit={handleCreateInterviewer}
+          mappingValues={mappingValues}
         />
       )}
 
@@ -383,6 +394,7 @@ export function InterviewerList() {
             },
           }}
           interviewerId={interviewerDetail?.id || undefined}
+          mappingValues={mappingValues}
         />
       )}
     </div>

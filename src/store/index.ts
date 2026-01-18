@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import jobsReducer from "./jobs/jobsSlice";
+import interviewersReducer from "./interviewers/interviewersSlice";
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       jobs: jobsReducer,
+      interviewers: interviewersReducer,
     },
   });
 };

@@ -68,6 +68,7 @@ export function CreateInterviewerModal({
   open,
   onOpenChange,
   onSubmit: onSubmitCallback,
+  mappingValues,
   isEditMode = false,
   interviewerDetail,
   interviewerId,
@@ -211,11 +212,13 @@ export function CreateInterviewerModal({
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
-                    {voiceOptions?.map((option) => (
-                      <SelectItem key={option?.value} value={option?.value}>
-                        {option?.label}
-                      </SelectItem>
-                    ))}
+                    {mappingValues?.interviewers?.voice?.map(
+                      (option: string) => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      )
+                    )}
                   </SelectContent>
                 </Select>
                 {formik.touched.voice && formik.errors.voice && (
@@ -311,11 +314,13 @@ export function CreateInterviewerModal({
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
-                    {roundTypeOptions.map((option) => (
-                      <SelectItem key={option?.value} value={option?.value}>
-                        {option?.label}
-                      </SelectItem>
-                    ))}
+                    {mappingValues?.interviewers?.roundType?.map(
+                      (option: string) => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      )
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -333,11 +338,13 @@ export function CreateInterviewerModal({
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
-                    {languageOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
+                    {mappingValues?.interviewers?.language?.map(
+                      (option: string) => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      )
+                    )}
                   </SelectContent>
                 </Select>
               </div>
