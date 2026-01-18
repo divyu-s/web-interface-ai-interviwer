@@ -45,8 +45,10 @@ const extractFormProperties = (formProperties: any[], targets: string[]) => {
     if (Array.isArray(section?.fields || [])) {
       for (const field of section?.fields || []) {
         if (targets.includes(field?.key || "")) {
-          result[field?.key || ""] = Array.isArray(field?.options || [])
-            ? field?.options
+          result[field?.key || ""] = Array.isArray(
+            field?.optionsConfig?.values || []
+          )
+            ? field?.optionsConfig?.values
             : [];
         }
       }

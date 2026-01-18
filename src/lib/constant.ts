@@ -9,7 +9,8 @@ export const API_ENDPOINTS = {
     DELETE: "/api/objects/69521d4cc9ba83a076aac3b8/records/{id}",
     DETAIL: "/api/objects/69521d4cc9ba83a076aac3b8/records/{id}",
     UPDATE: "/api/objects/69521d4cc9ba83a076aac3b8/records/{id}",
-    FORM_PROPERTIES: "/api/forms/69521d4cc9ba83a076aac3bb/properties",
+    FORM_PROPERTIES:
+      "/api/objects/69521d4cc9ba83a076aac3b8/forms/69521d4cc9ba83a076aac3bb/properties",
   },
   APPLICANT: {
     CREATE: "/api/v2/forminstances",
@@ -32,7 +33,8 @@ export const API_ENDPOINTS = {
     LIST: "/api/objects/69521d61c9ba83a076aac3c0/views/69521d61c9ba83a076aac3c1/records",
     UPDATE: "/api/objects/69521d61c9ba83a076aac3c0/records/{id}",
     DELETE: "/api/objects/69521d61c9ba83a076aac3c0/records/{id}",
-    FORM_PROPERTIES: "/api/forms/69521d61c9ba83a076aac3c3/properties",
+    FORM_PROPERTIES:
+      "/api/objects/69521d61c9ba83a076aac3c0/forms/69521d61c9ba83a076aac3c3/properties",
   },
   INTERVIEW: {
     CREATE: "/api/v2/forminstances",

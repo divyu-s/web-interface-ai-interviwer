@@ -38,7 +38,13 @@ import {
   CreateRoundModalProps,
   RoundFormData,
 } from "../interfaces/shared.interface";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { interviewerService } from "../../app-view/interviewer/services/interviewer.services";
+import {
+  Interviewer,
+  APIPaginationInfo,
+} from "../../app-view/interviewer/interfaces/interviewer.interfaces";
+import { transformAPIResponseToInterviewers } from "../../app-view/interviewer/utils/interviewer.utils";
 
 const validate = (values: RoundFormData) => {
   const errors: Partial<Record<keyof RoundFormData, string>> = {};
@@ -194,15 +200,6 @@ const isStepValid = (step: 1 | 2 | 3, values: RoundFormData): boolean => {
   return Object.keys(stepErrors).length === 0;
 };
 
-const mockInterviewers = [
-  { id: "1", name: "Product Manager", image: "/interviewer-male.jpg" },
-  { id: "2", name: "HR Manager", image: "/interviewer-female.jpg" },
-  { id: "3", name: "UX Designer", image: "/interviewer-male.jpg" },
-  { id: "4", name: "Sales", image: "/interviewer-female.jpg" },
-  { id: "5", name: "Marketing", image: "/interviewer-male.jpg" },
-  { id: "6", name: "Software Engineer", image: "/interviewer-female.jpg" },
-];
-
 export function CreateRoundModal({
   open,
   onOpenChange,
@@ -216,6 +213,16 @@ export function CreateRoundModal({
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [skillInput, setSkillInput] = useState("");
+  const [interviewers, setInterviewers] = useState<Interviewer[]>([]);
+  const [isLoadingInterviewers, setIsLoadingInterviewers] = useState(false);
+  const [pagination, setPagination] = useState<APIPaginationInfo>({
+    total: 0,
+    nextOffset: null,
+    previousOffset: null,
+    limit: 10,
+  });
+  const [currentOffset, setCurrentOffset] = useState(0);
+  const interviewerContainerRef = useRef<HTMLDivElement>(null);
 
   const formik = useFormik<RoundFormData>({
     initialValues: {
@@ -288,6 +295,108 @@ export function CreateRoundModal({
       }
     },
   });
+
+  useEffect(() => {
+    setCurrentOffset(0);
+    setInterviewers([]);
+  }, [formik?.values?.roundType, formik?.values?.language]);
+
+  useEffect(() => {
+    fetchInterviewers(currentOffset, currentOffset > 0);
+  }, [currentOffset]);
+
+  // Handle scroll for lazy loading
+  useEffect(() => {
+    const container = interviewerContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
+
+      // Load more when scrolled 80% down
+      if (
+        scrollPercentage >= 0.8 &&
+        pagination.nextOffset !== null &&
+        !isLoadingInterviewers
+      ) {
+        setCurrentOffset(pagination.nextOffset);
+      }
+    };
+
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [pagination.nextOffset, isLoadingInterviewers]);
+
+  const fetchInterviewers = async (offset: number, append: boolean = false) => {
+    setIsLoadingInterviewers(true);
+    try {
+      const params: Record<string, any> = {
+        limit: 10, // Initial load of 10 interviewers
+        offset: offset,
+      };
+
+      // Build filters based on roundType and language from form
+      const filterConditions: any[] = [];
+
+      const roundType = formik.values.roundType;
+      const language = formik.values.language;
+
+      if (roundType) {
+        filterConditions.push({
+          key: "#.records.roundType",
+          operator: "$in",
+          value: [roundType],
+          type: "select",
+        });
+      }
+
+      if (language) {
+        filterConditions.push({
+          key: "#.records.language",
+          operator: "$in",
+          value: [language],
+          type: "select",
+        });
+      }
+
+      const response = await interviewerService.getInterviewers(params, {
+        filters: {
+          $and: filterConditions,
+        },
+        appId: "69521cd1c9ba83a076aac3ae",
+      });
+
+      const result = transformAPIResponseToInterviewers(
+        response?.data || [],
+        response?.page || {
+          total: 0,
+          nextOffset: null,
+          previousOffset: null,
+          limit: 10,
+        }
+      );
+
+      if (append) {
+        setInterviewers((prev) => [...prev, ...(result?.interviewers || [])]);
+      } else {
+        setInterviewers(result?.interviewers || []);
+      }
+      setPagination(result?.pagination);
+    } catch (error: any) {
+      if (!append) {
+        setInterviewers([]);
+      }
+      toast.error(
+        error?.response?.data?.message || "Failed to fetch interviewers",
+        {
+          duration: 8000,
+        }
+      );
+    } finally {
+      setIsLoadingInterviewers(false);
+    }
+  };
 
   const handleNext = () => {
     setStep((prev) => (prev + 1) as 1 | 2 | 3);
@@ -506,7 +615,11 @@ export function CreateRoundModal({
                   <Label className="text-sm font-medium text-[#0a0a0a] leading-5">
                     Select Interviewer
                   </Label>
-                  <div className="flex gap-2 flex-wrap">
+                  <div
+                    ref={interviewerContainerRef}
+                    className="flex gap-2 flex-wrap max-h-[200px] overflow-y-auto"
+                    style={{ scrollbarWidth: "thin" }}
+                  >
                     {/* Add new card */}
                     <button
                       type="button"
@@ -521,31 +634,46 @@ export function CreateRoundModal({
                     </button>
 
                     {/* Interviewer cards */}
-                    {mockInterviewers.map((interviewer) => (
-                      <button
-                        key={interviewer?.id}
-                        type="button"
-                        onClick={() => selectInterviewer(interviewer?.id)}
-                        className={`border rounded p-1 flex flex-col items-center gap-1 w-[70px] h-[98px] transition-all ${
-                          formik.values.interviewer === interviewer?.id
-                            ? "border-[#02563d] bg-[#f0f5f2] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)]"
-                            : "border-[#d1d1d1]"
-                        }`}
-                      >
-                        <div className="relative rounded w-[62px] h-[62px] overflow-hidden">
-                          <Image
-                            src={interviewer?.image}
-                            alt={interviewer?.name}
-                            fill
-                            className="object-cover"
-                            sizes="62px"
-                          />
-                        </div>
-                        <p className="text-xs text-[#737373] leading-none text-center w-[62px]">
-                          {interviewer?.name}
-                        </p>
-                      </button>
-                    ))}
+                    {interviewers?.length === 0 && isLoadingInterviewers ? (
+                      <div className="flex items-center justify-center w-[70px] h-[98px]">
+                        <div className="w-8 h-8 border-2 border-[#02563d] border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    ) : (
+                      <>
+                        {interviewers.map((interviewer) => (
+                          <button
+                            key={interviewer?.id}
+                            type="button"
+                            onClick={() => selectInterviewer(interviewer?.id)}
+                            className={`border rounded p-1 flex flex-col items-center gap-1 w-[70px] h-[98px] transition-all ${
+                              formik.values.interviewer === interviewer?.id
+                                ? "border-[#02563d] bg-[#f0f5f2] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)]"
+                                : "border-[#d1d1d1]"
+                            }`}
+                          >
+                            <div className="relative rounded w-[62px] h-[62px] overflow-hidden">
+                              <Image
+                                src={
+                                  interviewer?.avatar || "/interviewer-male.jpg"
+                                }
+                                alt={interviewer?.name}
+                                fill
+                                className="object-cover"
+                                sizes="62px"
+                              />
+                            </div>
+                            <p className="text-xs text-[#737373] leading-none text-center w-[62px]">
+                              {interviewer?.name}
+                            </p>
+                          </button>
+                        ))}
+                        {isLoadingInterviewers && interviewers.length > 0 && (
+                          <div className="flex items-center justify-center w-[70px] h-[98px]">
+                            <div className="w-6 h-6 border-2 border-[#02563d] border-t-transparent rounded-full animate-spin" />
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
                 </div>
 
