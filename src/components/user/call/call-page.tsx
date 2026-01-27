@@ -196,8 +196,8 @@ export default function CallPage({ interviewId }: CallPageProps) {
       flowState === "verification-ready"
         ? "ready"
         : flowState === "verification-recording"
-        ? "recording"
-        : "completed";
+          ? "recording"
+          : "completed";
 
     return (
       <VerificationFlow
@@ -222,11 +222,6 @@ export default function CallPage({ interviewId }: CallPageProps) {
         onInterviewStart={() => setIsInterviewActive(true)}
         videoRef={videoRef}
         applicantName={applicantName}
-        interviewTimer={interviewTimer}
-        currentQuestion={currentQuestion}
-        totalQuestions={totalQuestions}
-        onNextQuestion={handleNextQuestion}
-        formatTime={formatTime}
       />
     );
   }

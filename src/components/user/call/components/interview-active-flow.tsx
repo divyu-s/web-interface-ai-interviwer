@@ -25,11 +25,6 @@ interface InterviewActiveFlowProps {
   onInterviewStart: () => void;
   videoRef: React.RefObject<HTMLVideoElement | null>;
   applicantName: string;
-  interviewTimer: number;
-  currentQuestion: number;
-  totalQuestions: number;
-  onNextQuestion: () => void;
-  formatTime: (seconds: number) => string;
 }
 
 export function InterviewActiveFlow({
@@ -38,14 +33,9 @@ export function InterviewActiveFlow({
   onInterviewStart,
   videoRef,
   applicantName,
-  interviewTimer,
-  currentQuestion,
-  totalQuestions,
-  onNextQuestion,
-  formatTime,
 }: InterviewActiveFlowProps) {
   const [showTipsModal, setShowTipsModal] = useState(true);
-  const isLastQuestion = currentQuestion === totalQuestions;
+
 
   // Ensure video plays when component mounts and stream is available
   useEffect(() => {
@@ -62,14 +52,7 @@ export function InterviewActiveFlow({
     onInterviewStart();
   };
 
-  const handleNextQuestion = () => {
-    if (currentQuestion < totalQuestions) {
-      onNextQuestion();
-    } else {
-      onStateChange("interview-complete");
-      onStopCamera();
-    }
-  };
+
 
   return (
     <>
@@ -92,7 +75,7 @@ export function InterviewActiveFlow({
             {/* Hero Video Container - Center Focused */}
             <div className="w-full aspect-video group">
               {/* Professional Video Frame */}
-              <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-[0_20px_60px_-12px_rgba(0,0,0,0.15)] border border-gray-200/80 bg-white">
+              <div className="w-full h-full">
                 {/* Video Element */}
                 <video
                   ref={videoRef}
@@ -107,20 +90,8 @@ export function InterviewActiveFlow({
                   }}
                 />
 
-                {/* Subtle Bottom Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
 
-                {/* Top Status Indicators - Minimal & Professional */}
-                <div className="absolute top-5 left-5 right-5 flex items-center justify-between">
-                  {/* Live Indicator */}
-                  <div className="flex items-center gap-2 px-3.5 py-1.5 bg-white/95 backdrop-blur-xl rounded-lg border border-gray-200/60 shadow-lg">
-                    <div className="relative">
-                      <div className="w-2 h-2 bg-emerald-500 rounded-full" />
-                      <div className="absolute inset-0 w-2 h-2 bg-emerald-500 rounded-full animate-ping opacity-75" />
-                    </div>
-                    <span className="text-xs font-semibold text-gray-800 tracking-wide">LIVE</span>
-                  </div>
-                </div>
+
               </div>
             </div>
 
@@ -136,7 +107,7 @@ export function InterviewActiveFlow({
         {/* Right Panel */}
         <div className="w-1/2 p-6 flex flex-col bg-white">
           <LiveKitRoom
-            token={`eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRGV2cmlzaGkgQmhhcmR3YWoiLCJ2aWRlbyI6eyJyb29tSm9pbiI6dHJ1ZSwicm9vbSI6ImludGVydmlldy02OTYzY2VhNWM5YmE4M2EwNzZhYWM5NDAtNjk1ZWY4YTciLCJjYW5QdWJsaXNoIjp0cnVlLCJjYW5TdWJzY3JpYmUiOnRydWUsImNhblB1Ymxpc2hEYXRhIjp0cnVlfSwic3ViIjoiY2FuZGlkYXRlLTY5NjNjZWE1YzliYTgzYTA3NmFhYzk0MCIsImlzcyI6IkFQSXR5bnp3UmtQZWh1ciIsIm5iZiI6MTc2OTUzMDUwNiwiZXhwIjoxNzY5NTM0MTA2fQ.g5_kL41MaPfkcJsQBhlxbnqbyLjxQp9e7Agy7oqn-lA`}
+            token={`eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRGV2cmlzaGkgQmhhcmR3YWoiLCJ2aWRlbyI6eyJyb29tSm9pbiI6dHJ1ZSwicm9vbSI6ImludGVydmlldy02OTYzY2VhNWM5YmE4M2EwNzZhYWM5NDAtMmQ1ZTA4Y2EiLCJjYW5QdWJsaXNoIjp0cnVlLCJjYW5TdWJzY3JpYmUiOnRydWUsImNhblB1Ymxpc2hEYXRhIjp0cnVlfSwic3ViIjoiY2FuZGlkYXRlLTY5NjNjZWE1YzliYTgzYTA3NmFhYzk0MCIsImlzcyI6IkFQSXR5bnp3UmtQZWh1ciIsIm5iZiI6MTc2OTUzMjA3MywiZXhwIjoxNzY5NTM1NjczfQ.1-xWzK02Xzxj60LQL7r4lH0mpCFTXHDcKjZFA3WinB0`}
             serverUrl="wss://voicebot-kj0vxeoj.livekit.cloud"
             connect
             data-lk-theme="default"
