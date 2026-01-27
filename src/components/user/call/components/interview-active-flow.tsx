@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Clock, ChevronRight, Check, User } from "lucide-react";
+import { Clock, ChevronRight, Check, Video, Mic2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -72,42 +72,62 @@ export function InterviewActiveFlow({
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
       <Header isUser={true} />
-      <div className="flex h-screen">
-        {/* Left Panel */}
-        <div className="w-1/2 border-r border-[#e5e5e5] p-6 flex flex-col bg-[#fafafa]">
-          <div className="flex-1 flex flex-col items-center justify-center gap-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-semibold text-[#0a0a0a] mb-2">
-                Skills round
-              </h2>
-              <p className="text-sm text-[#717182]">
-                Duration of this round: 30 min.
-              </p>
+      <div className="flex">
+        {/* Left Panel - Professional Video-Focused Design */}
+        <div className="w-1/2 border-r border-gray-200/50 bg-gradient-to-br from-slate-50 via-white to-slate-50/50 overflow-hidden">
+          <div className="flex flex-col items-center justify-center p-4 gap-10">
+            {/* Minimal Header - Top Left */}
+            <div className="flex justify-between w-full animate-fade-in">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/90 backdrop-blur-sm border border-[#02563d]/20 rounded-lg shadow-sm">
+                <div className="w-2 h-2 bg-[#02563d] rounded-full animate-pulse shadow-[0_0_6px_rgba(2,86,61,0.5)]" />
+                <span className="text-xs font-semibold text-[#02563d] tracking-wide">
+                  Skills Round
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 mt-0.5 font-medium">30 min duration</p>
             </div>
 
-            <div className="relative w-full max-w-md aspect-video bg-[#f5f5f5] rounded-lg overflow-hidden">
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className="w-full h-full object-cover"
-                onLoadedMetadata={(e) => {
-                  e.currentTarget.play().catch((error) => {
-                    console.error("Error playing video on load:", error);
-                  });
-                }}
-              />
-              {/* Timer overlay on video - positioned at bottom center */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-black/50 backdrop-blur-sm rounded-full">
-                  <Clock className="w-4 h-4 text-white" />
-                  <span className="text-sm font-medium text-white">
-                    {formatTime(interviewTimer)}
-                  </span>
+            {/* Hero Video Container - Center Focused */}
+            <div className="w-full aspect-video group">
+              {/* Professional Video Frame */}
+              <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-[0_20px_60px_-12px_rgba(0,0,0,0.15)] border border-gray-200/80 bg-white">
+                {/* Video Element */}
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-full h-full object-cover"
+                  onLoadedMetadata={(e) => {
+                    e.currentTarget.play().catch((error) => {
+                      console.error("Error playing video on load:", error);
+                    });
+                  }}
+                />
+
+                {/* Subtle Bottom Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
+
+                {/* Top Status Indicators - Minimal & Professional */}
+                <div className="absolute top-5 left-5 right-5 flex items-center justify-between">
+                  {/* Live Indicator */}
+                  <div className="flex items-center gap-2 px-3.5 py-1.5 bg-white/95 backdrop-blur-xl rounded-lg border border-gray-200/60 shadow-lg">
+                    <div className="relative">
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full" />
+                      <div className="absolute inset-0 w-2 h-2 bg-emerald-500 rounded-full animate-ping opacity-75" />
+                    </div>
+                    <span className="text-xs font-semibold text-gray-800 tracking-wide">LIVE</span>
+                  </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Applicant Name - Bottom Center */}
+            <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <div className="px-4 py-2 bg-white/95 backdrop-blur-md rounded-lg border border-gray-200/60 shadow-lg">
+                <p className="text-sm font-semibold text-gray-800">{applicantName}</p>
               </div>
             </div>
           </div>
@@ -116,11 +136,10 @@ export function InterviewActiveFlow({
         {/* Right Panel */}
         <div className="w-1/2 p-6 flex flex-col bg-white">
           <LiveKitRoom
-            token={`eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRGV2cmlzaGkgQmhhcmR3YWoiLCJ2aWRlbyI6eyJyb29tSm9pbiI6dHJ1ZSwicm9vbSI6ImludGVydmlldy02OTYzY2VhNWM5YmE4M2EwNzZhYWM5NDAtNjI2YWZhYWYiLCJjYW5QdWJsaXNoIjp0cnVlLCJjYW5TdWJzY3JpYmUiOnRydWUsImNhblB1Ymxpc2hEYXRhIjp0cnVlfSwic3ViIjoiY2FuZGlkYXRlLTY5NjNjZWE1YzliYTgzYTA3NmFhYzk0MCIsImlzcyI6IkFQSXR5bnp3UmtQZWh1ciIsIm5iZiI6MTc2ODU2NTU2NywiZXhwIjoxNzY4NTY5MTY3fQ.Gn_A9O2Ptk-eou17usoz2Wc7o-esZ23WeRlCoUjAJRQ`}
+            token={`eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRGV2cmlzaGkgQmhhcmR3YWoiLCJ2aWRlbyI6eyJyb29tSm9pbiI6dHJ1ZSwicm9vbSI6ImludGVydmlldy02OTYzY2VhNWM5YmE4M2EwNzZhYWM5NDAtYjM5OTI3MDkiLCJjYW5QdWJsaXNoIjp0cnVlLCJjYW5TdWJzY3JpYmUiOnRydWUsImNhblB1Ymxpc2hEYXRhIjp0cnVlfSwic3ViIjoiY2FuZGlkYXRlLTY5NjNjZWE1YzliYTgzYTA3NmFhYzk0MCIsImlzcyI6IkFQSXR5bnp3UmtQZWh1ciIsIm5iZiI6MTc2OTUyODA2MCwiZXhwIjoxNzY5NTMxNjYwfQ.W1jQ6mg71UVC9X8dMnYa6fMFQ0NuDsxSu3AMY5Lz3gU`}
             serverUrl="wss://voicebot-kj0vxeoj.livekit.cloud"
             connect
             data-lk-theme="default"
-            style={{ height: "100vh" }}
           >
             <CustomVideoConference
               onEndCall={() => {
@@ -162,6 +181,6 @@ export function InterviewActiveFlow({
           </Button>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }
