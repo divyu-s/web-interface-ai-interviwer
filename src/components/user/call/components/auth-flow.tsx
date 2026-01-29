@@ -66,10 +66,6 @@ export function AuthFlow({
         return;
       }
 
-
-
-
-
       setIsSubmitting(true);
 
       try {

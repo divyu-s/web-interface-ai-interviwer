@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 import { AuthFlow } from "./components/auth-flow";
-import type { StartInterviewParams } from "./components/auth-flow";
 import { GuidelinesFlow } from "./components/guidelines-flow";
 import { VerificationInstructionsFlow } from "./components/verification-instructions-flow";
 import { VerificationFlow } from "./components/verification-flow";

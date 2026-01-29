@@ -201,6 +201,7 @@ export function CustomVideoConference({
         </div>
       </div>
 
+
       {/* Essential LiveKit Components */}
       <RoomAudioRenderer />
       <ConnectionStateToast />

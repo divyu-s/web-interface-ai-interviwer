@@ -1,11 +1,4 @@
-import axios from "axios";
 import serverInterfaceService from "./server-interface.service";
-
-export interface LiveKitTokenResponse {
-  token: string;
-  url: string;
-  roomName: string;
-}
 
 export interface StartInterviewResponse {
   success: boolean;
