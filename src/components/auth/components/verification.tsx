@@ -95,7 +95,7 @@ export default function Verification() {
 
   // onChange handler for verification code
   const handleVerificationCodeChange = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const newValue = e.target.value.replace(/\D/g, ""); // Only allow digits
     formik.setFieldValue("verificationCode", newValue);
