@@ -1,3 +1,5 @@
+import { InterviewFlowState } from "../types/flow.types";
+
 export interface ValidationError {
   [key: string]: string | undefined;
 }
@@ -38,4 +40,8 @@ export interface AuthFlowProps {
     startInterviewResponse: StartInterviewResponse,
   ) => void;
   interviewId?: string;
+}
+
+export interface GuidelinesFlowProps {
+  onStateChange: (state: InterviewFlowState) => void;
 }

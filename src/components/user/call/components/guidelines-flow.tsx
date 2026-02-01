@@ -6,12 +6,9 @@ import { Monitor, Clock, HelpCircle, ChevronRight, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
-import { InterviewFlowState } from "../types/flow.types";
-import { Header } from "@/components/header";
 
-interface GuidelinesFlowProps {
-  onStateChange: (state: InterviewFlowState) => void;
-}
+import { Header } from "@/components/header";
+import { GuidelinesFlowProps } from "../interfaces/applicant-auth.interface";
 
 export function GuidelinesFlow({ onStateChange }: GuidelinesFlowProps) {
   const [checklistItems, setChecklistItems] = useState({
@@ -106,16 +103,16 @@ export function GuidelinesFlow({ onStateChange }: GuidelinesFlowProps) {
                   },
                 ].map((item) => (
                   <Card
-                    key={item.key}
+                    key={item?.key}
                     className="border border-[#e5e5e5] rounded-[14px] p-3 bg-white shadow-[0_1px_2px_0_rgba(2,86,61,0.12)]"
                   >
                     <div className="flex items-start gap-3">
                       <div className="pt-0.5 shrink-0">
                         <Checkbox
-                          id={item.key}
+                          id={item?.key}
                           checked={
                             checklistItems[
-                              item.key as keyof typeof checklistItems
+                              item?.key as keyof typeof checklistItems
                             ]
                           }
                           onCheckedChange={(checked) => {
@@ -128,7 +125,7 @@ export function GuidelinesFlow({ onStateChange }: GuidelinesFlowProps) {
                       </div>
                       <div className="flex-1">
                         <label
-                          htmlFor={item.key}
+                          htmlFor={item?.key}
                           className="text-sm font-medium text-[#0a0a0a] block mb-1 cursor-pointer leading-5"
                         >
                           {item?.title}
